@@ -9,10 +9,10 @@ export default function FollowUpPlanForm({doctorId,appointments}:{doctorId:strin
   const [message,setMessage]=useState("");
   const [draftId,setDraftId]=useState<string|null>(null);
   async function submit(event:FormEvent<HTMLFormElement>) {
-    event.preventDefault();setBusy(true);setMessage("");
+    event.preventDefault();const formElement=event.currentTarget;setBusy(true);setMessage("");
     try {
       const supabase=createClient();
-      const form=new FormData(event.currentTarget);
+      const form=new FormData(formElement);
       const patientId=String(form.get("appointment")||"");
       const appointment=appointments.find(a=>a.id===patientId);
       if(!appointment) throw new Error("Sélectionnez un rendez-vous existant.");
@@ -27,7 +27,7 @@ export default function FollowUpPlanForm({doctorId,appointments}:{doctorId:strin
       if(error) throw error;
       setDraftId(data.id);
       setMessage("Brouillon enregistré. Relisez-le avant publication.");
-      event.currentTarget.reset();
+      formElement.reset();
     } catch(e) {setMessage(e instanceof Error?e.message:"Impossible d'enregistrer le suivi.");}
     finally {setBusy(false);}
   }
