@@ -35,7 +35,7 @@ export default function AuthForm({ mode, locale }: { mode: Mode; locale: string 
           password: String(form.get("password") ?? ""),
           options: {
             data: { full_name: String(form.get("full_name") ?? ""), preferred_language: locale },
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/${locale}`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=/${locale}/patient`,
           },
         });
         if (authError) throw authError;
@@ -47,7 +47,9 @@ export default function AuthForm({ mode, locale }: { mode: Mode; locale: string 
           password: String(form.get("password") ?? ""),
         });
         if (authError) throw authError;
-        router.push(`/${locale}/professional`);
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data: doctor } = user ? await supabase.from("doctors").select("id").eq("user_id", user.id).maybeSingle() : { data: null };
+        router.push(doctor ? `/${locale}/professional` : `/${locale}/patient`);
         router.refresh();
       } else {
         const { data } = await supabase.auth.getUser();
