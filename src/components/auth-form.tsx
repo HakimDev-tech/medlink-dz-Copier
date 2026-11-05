@@ -54,6 +54,7 @@ export default function AuthForm({ mode, locale }: { mode: Mode; locale: string 
         if (!data.user) throw new Error("Connectez-vous d'abord avec votre compte.");
         const { error: insertError } = await supabase.from("doctors").insert({
           user_id: data.user.id,
+          display_name: String(form.get("display_name") ?? ""),
           specialty: String(form.get("specialty") ?? ""),
           wilaya: String(form.get("wilaya") ?? ""),
           registration_reference: String(form.get("registration_reference") ?? ""),
@@ -78,6 +79,7 @@ export default function AuthForm({ mode, locale }: { mode: Mode; locale: string 
       {mode !== "doctor" && <div className="input"><label>Adresse e-mail</label><input name="email" type="email" required autoComplete="email"/></div>}
       {mode !== "doctor" && <div className="input"><label>Mot de passe</label><input name="password" type="password" required minLength={8} autoComplete={mode === "login" ? "current-password" : "new-password"}/></div>}
       {mode === "doctor" && <>
+        <div className="input"><label>Nom public du professionnel</label><input name="display_name" required maxLength={120}/></div>
         <div className="input"><label>Spécialité</label><input name="specialty" required maxLength={100}/></div>
         <div className="input"><label>Wilaya</label><input name="wilaya" required maxLength={80}/></div>
         <div className="input"><label>Référence professionnelle (sans document)</label><input name="registration_reference" required maxLength={120}/></div>
