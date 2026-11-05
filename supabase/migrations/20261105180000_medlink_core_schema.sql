@@ -141,4 +141,8 @@ grant select on public.clinics to authenticated;
 grant select on public.profiles,public.clinic_members,public.appointments,public.follow_up_plans,public.follow_up_events,public.home_visit_requests,public.conversations,public.messages,public.notifications,public.refund_requests to authenticated;
 revoke all on public.audit_logs from anon,authenticated;
 grant select on public.audit_logs to authenticated;
-revoke execute on function public.rls_auto_enable() from public,anon,authenticated;
+do $ begin
+ if to_regprocedure('public.rls_auto_enable()') is not null then
+  execute 'revoke execute on function public.rls_auto_enable() from public, anon, authenticated';
+ end if;
+end $;
