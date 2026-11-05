@@ -1,47 +1,57 @@
 # MedLink DZ
 
-Prototype universitaire trilingue (français, arabe, anglais) de coordination du parcours de soin en Algérie.
+MVP produit de coordination du parcours de soins en Algérie, disponible en français, arabe et anglais. L'objectif est un lancement public progressif avec des professionnels réellement vérifiés et des utilisateurs réels, après validation des prérequis réglementaires et opérationnels.
 
 ## Stack
-- Next.js 15.5.28 (correctif de sécurité), React 19, TypeScript, Tailwind CSS 4
-- Supabase Auth, PostgreSQL et RLS
+- Next.js 15.5.28, React 19, TypeScript, Tailwind CSS 4
+- Supabase Auth, PostgreSQL, Row Level Security et Realtime
 - Vercel
 
-## Démarrer
+## Développement local
 ```bash
 npm install
 npm run dev
 ```
 
-Copier `.env.example` vers `.env.local`, puis renseigner :
+Copier `.env.example` vers `.env.local` et renseigner :
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-N'ajoutez jamais de clé `service_role` ou `sb_secret_*` dans une variable `NEXT_PUBLIC_*` ni dans le navigateur.
+Ne jamais exposer une clé `service_role` ou `sb_secret_*` dans le navigateur ou une variable `NEXT_PUBLIC_*`.
 
-## Parcours implémentés
-- `/[locale]` : landing page trilingue
-- `/[locale]/doctors` : annuaire alimenté par Supabase, profils vérifiés uniquement
-- `/[locale]/register`, `/[locale]/login` : inscription patient et connexion Supabase Auth
-- `/[locale]/professional/register` : dépôt de candidature professionnelle (statut initial pending)
-- `/[locale]/professional` : rendez-vous du professionnel, confirmation/refus, création d'un suivi brouillon puis publication
-- `/[locale]/patient` : rendez-vous et suivis publiés
-- `/auth/callback` : échange PKCE du code d'authentification
-- `/[locale]/admin/verifications` : interface de démonstration uniquement (pas encore reliée à un rôle administrateur réel)
+## Fonctionnalités du MVP
+- Comptes patients et professionnels via Supabase Auth
+- Annuaire public limité aux professionnels approuvés par MedLink
+- Demandes de rendez-vous, décisions du professionnel et notifications internes
+- Messagerie privée patient-professionnel en temps réel
+- Demandes de visites à domicile avec traitement par le professionnel choisi
+- Suivis post-consultation créés et publiés par le professionnel
+- Administration protégée pour l'examen des candidatures, les décisions de vérification et le journal d'audit
+- Interface responsive, français / arabe RTL / anglais
 
-## Base de données
-Migrations dans `supabase/migrations`. Schéma appliqué au projet Supabase `medlink-DZ` :
-- profils, médecins, cliniques et membres
-- rendez-vous, plans de suivi et événements
-- visites à domicile, conversations et messages
-- notifications, demandes de remboursement, journaux d'audit
-- RLS activée sur toutes les tables exposées
-- le rôle médecin est attribué par trigger après dépôt d'une candidature, sans accepter de rôle fourni par l'utilisateur
-- les décisions de vérification ne sont pas accessibles aux utilisateurs depuis le client
+## Sécurité
+- Row Level Security sur les tables exposées
+- Rôles non modifiables par les utilisateurs depuis le client
+- Permissions SQL limitées par colonne et transitions d'état validées en base
+- Conversations et profils patients visibles uniquement par leurs participants et professionnels ayant une relation active
+- Documents de vérification à stocker dans un bucket privé, jamais dans un bucket public
 
-## Limites importantes
-Ce dépôt reste un MVP universitaire, pas un logiciel médical certifié. Les profils sont masqués tant que leur vérification n'est pas approuvée. Le statut « vérifié par la plateforme » ne signifie pas agrément ministériel ou autorisation officielle.
+## Périmètre exclu du premier lancement
+- Encaissement des consultations, paiements en ligne et remboursements automatiques
+- Notifications SMS, WhatsApp ou appels téléphoniques
+- Diagnostic, prescription ou décision clinique par IA
+- Planification automatique avancée et intégrations hospitalières
+- Gestion multi-clinique avancée et abonnements payants
 
-Ne pas utiliser de vraies données de santé, pièces d'identité, prescriptions ou informations de patients dans la démo. Les consignes publiées doivent être fictives. Les paiements, remboursements, SMS, appels, moteur de notifications planifiées, IA clinique, multi-clinique avancé et workflow administrateur complet ne sont pas encore implémentés.
+Ces fonctions ne doivent pas être présentées comme disponibles tant que leur implémentation et leurs tests ne sont pas achevés.
 
-Avant toute mise en production : revue juridique algérienne, analyse des obligations de la loi 18-07 telle que modifiée, contrôle ANPDP, audit de sécurité, politique de conservation et hébergement, tests d'intrusion et procédure de vérification des professionnels.
+## Conditions préalables au lancement public
+- Validation par un conseil juridique local des obligations applicables, notamment la loi 18-07 modifiée et les exigences ANPDP
+- Validation du cadre applicable aux services de santé et à la publicité des professionnels
+- Procédure documentée de vérification des diplômes, cartes et autorisations professionnelles, avec renouvellement et suspension
+- Politique de confidentialité, consentement, conservation, suppression et gestion des incidents
+- Contrat et responsabilités des professionnels et cliniques partenaires
+- Tests de sécurité indépendants, tests de charge, sauvegardes et procédure de restauration
+- Configuration des domaines, e-mails transactionnels, surveillance et support utilisateur
+
+Le statut « Vérifié par MedLink » décrit uniquement le contrôle interne de la plateforme. Il ne signifie pas agrément ministériel ni autorisation de l'État.
