@@ -25,6 +25,7 @@ Ne jamais exposer une clé `service_role` ou `sb_secret_*` dans le navigateur ou
 - Demandes de rendez-vous, décisions du professionnel et notifications internes
 - Messagerie privée patient-professionnel en temps réel
 - Demandes de visites à domicile avec traitement par le professionnel choisi
+- Dépôt sécurisé de justificatifs professionnels dans un stockage privé, examen documentaire par les administrateurs et blocage SQL de la vérification publique sans justificatif accepté
 - Suivis post-consultation créés et publiés par le professionnel
 - Administration protégée pour l'examen des candidatures, les décisions de vérification et le journal d'audit
 - Interface responsive, français / arabe RTL / anglais
@@ -34,7 +35,7 @@ Ne jamais exposer une clé `service_role` ou `sb_secret_*` dans le navigateur ou
 - Rôles non modifiables par les utilisateurs depuis le client
 - Permissions SQL limitées par colonne et transitions d'état validées en base
 - Conversations et profils patients visibles uniquement par leurs participants et professionnels ayant une relation active
-- Documents de vérification à stocker dans un bucket privé, jamais dans un bucket public
+- Documents de vérification stockés dans un bucket privé, avec accès limité au professionnel concerné et aux administrateurs habilités
 
 ## Périmètre exclu du premier lancement
 - Encaissement des consultations, paiements en ligne et remboursements automatiques
