@@ -63,8 +63,10 @@ export default function AuthForm({ mode, locale }: { mode: Mode; locale: string 
           verification_status: "pending",
         });
         if (insertError) throw insertError;
-        setNotice("Demande enregistrée. Votre profil reste masqué de l'annuaire jusqu'à vérification.");
+        setNotice("Demande enregistrée. Ajoutez vos justificatifs professionnels pour terminer le dossier.");
         setUserId(data.user.id);
+        router.push(`/${locale}/professional`);
+        router.refresh();
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Une erreur est survenue.");
