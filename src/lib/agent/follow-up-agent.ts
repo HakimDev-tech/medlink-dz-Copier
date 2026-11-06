@@ -96,7 +96,7 @@ export function answerFromCarePlan(message: string, context: CarePlanContext, lo
   const clinical = /(diagnos|symptom|symptome|medicine|medication|drug|dose|dosage|pill|prescription|treatment|traitement|medicament|posologie|pain|fever|rash|headache|vomit|nausea|diarrhea|blood pressure|blood sugar|glucose|swelling|infection|douleur|fievre|fièvre|eruption|éruption|mal de tete|vomissement|nausee|nausée|diarrhee|diarrhée|tension|glycemie|glycémie|gonflement|جرعة|دواء|تشخيص|علاج|أعراض|اعراض|وصفة|اعراض جانبية|حمى|سخونة|صداع|قيء|غثيان|إسهال|اسهال|ضغط الدم|سكر الدم|تورم|التهاب)/i.test(normalized);
   if (clinical) return { intent: "out_of_scope", outcome: "human_handoff", answer: lang.out, handoff: true, safetyFlags: ["clinical_advice_blocked", "human_escalation"] };
 
-  const schedule = /(remind|reminder|schedule|when|date|time|how often|frequency|rappel|rappeler|quand|horaire|frequence|combien de fois|date|وقت|موعد|تذكير|التذكير|كم مرة|كل كم)/i.test(normalized);
+  const schedule = /(remind|reminder|follow up|follow-up|schedule|how often|frequency|rappel|rappeler|suivi|frequence|combien de fois|تذكير|التذكير|المتابعة|متابعة|كم مرة|كل كم)/i.test(normalized);
   if (schedule) return { intent: "schedule_lookup", outcome: "answered_from_plan", answer: lang.schedule(context.events), handoff: false, safetyFlags: [] };
 
   const passages = retrieveApprovedPassages(message, context.instructions);
