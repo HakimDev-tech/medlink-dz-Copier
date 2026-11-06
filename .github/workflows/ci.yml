@@ -34,6 +34,8 @@ jobs:
           else
             npm install
           fi
+      - name: Apply non-breaking dependency security fixes
+        run: npm audit fix || true
       - name: Commit npm lockfile when missing
         run: |
           git add package-lock.json
