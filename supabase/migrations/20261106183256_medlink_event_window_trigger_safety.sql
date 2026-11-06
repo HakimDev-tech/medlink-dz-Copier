@@ -1,4 +1,3 @@
--- Avoid relying on an unassigned OLD record in INSERT trigger branches.
 create or replace function private.enforce_followup_event_window()
 returns trigger
 language plpgsql

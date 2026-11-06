@@ -1,4 +1,3 @@
--- Validate follow-up date windows consistently in the database (Algeria local calendar).
 create or replace function private.enforce_followup_plan_integrity()
 returns trigger
 language plpgsql
