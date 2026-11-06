@@ -46,7 +46,7 @@ Il s'agit volontairement d'un **pseudo-RAG déterministe**, pas d'un LLM ni d'un
 
 ## Notifications synchronisées
 
-- Les demandes de rendez-vous, changements de statut, publications de compte rendu, publications de suivi et transferts vers le professionnel créent des notifications internes.
+- Les demandes de rendez-vous et de visite à domicile, les changements de statut, les annulations patient, les publications de compte rendu et de suivi ainsi que les transferts vers le professionnel créent des notifications internes.
 - Les rappels sont créés à partir des événements du programme validé.
 - La publication d'un programme alimente automatiquement la file `notification_schedules`.
 - Un job PostgreSQL `pg_cron` s'exécute chaque minute et distribue les notifications internes arrivées à échéance.
