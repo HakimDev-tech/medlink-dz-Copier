@@ -1,0 +1,64 @@
+export type Locale = "fr" | "en" | "ar";
+
+const messages = {
+  fr: {
+    authRequired:"Connexion requise", loginToContinue:"Connectez-vous pour accéder à cet espace.", signIn:"Se connecter",
+    requestAppointment:"Demander un rendez-vous", close:"Fermer", desiredDate:"Date et heure souhaitées", chooseFuture:"Choisissez une date future.",
+    requestSent:"Votre demande a été transmise. Le professionnel doit encore confirmer le rendez-vous.", sendRequest:"Envoyer la demande", sending:"Envoi…", requestFailed:"Impossible d'envoyer la demande. Réessayez.",
+    createFollowUp:"Créer un suivi après consultation", appointmentPatient:"Rendez-vous / patient", chooseAppointment:"Choisir un rendez-vous", selectAppointment:"Sélectionnez un rendez-vous existant.",
+    followUpTitle:"Titre du suivi", approvedInstructions:"Consignes validées par le professionnel", start:"Début", endOptional:"Fin (facultatif)", endAfterStart:"La date de fin doit suivre la date de début.",
+    saveDraft:"Enregistrer le brouillon", draftSaved:"Brouillon enregistré. Relisez-le avant publication.", publishFollowUp:"Publier le suivi dans l’espace patient", followUpPublished:"Suivi publié dans l’espace patient.", saveFailed:"Impossible d’enregistrer le suivi.", publishFailed:"Publication impossible.",
+    noAppointmentsForFollowUp:"Un rendez-vous doit exister avant de créer un suivi.",
+    homeVisitTitle:"Demander une visite à domicile", noVerifiedDoctors:"Aucun professionnel vérifié n’est disponible pour le moment.", professional:"Professionnel", chooseProfessional:"Choisir un professionnel", wilaya:"Wilaya", commune:"Commune", exactAddress:"Adresse exacte", reasonOptional:"Motif (facultatif)", addressPrivacy:"Votre adresse est communiquée uniquement au professionnel concerné afin de traiter cette demande.", reconnect:"Reconnectez-vous pour continuer.", homeVisitSent:"Votre demande a été transmise au professionnel sélectionné.", homeVisitFailed:"La demande n’a pas pu être envoyée. Réessayez.", transmitting:"Transmission…",
+    professionalDocuments:"Justificatifs professionnels", documentsHelp:"Déposez une carte professionnelle, une autorisation d’exercice ou un diplôme. Formats PDF, JPG ou PNG ; 10 Mo maximum. Ces documents sont privés et accessibles uniquement à vous et aux personnes habilitées à les examiner.",
+    documentType:"Type de document", professionalCard:"Carte professionnelle", license:"Autorisation / licence d’exercice", diploma:"Diplôme", file:"Fichier", selectFile:"Sélectionnez un fichier.", fileTooLarge:"Le fichier dépasse la limite de 10 Mo.", fileTypes:"Formats autorisés : PDF, JPG ou PNG.", upload:"Transmettre le document", uploading:"Transmission…", uploadSuccess:"Document transmis dans l’espace sécurisé de vérification.", uploadFailed:"Échec de la transmission du document.", noDocuments:"Aucun justificatif transmis.", reviewAccepted:"Justificatif accepté.", reviewRejected:"Justificatif refusé. Un document valide peut être demandé.",
+    noMessages:"Aucun message pour le moment. Vous pouvez commencer la conversation.", messageLabel:"Votre message", writeMessage:"Écrire un message…", send:"Envoyer", messageSending:"Envoi…", sessionExpired:"Votre session a expiré. Reconnectez-vous.", messageFailed:"Envoi impossible. Réessayez.",
+    openConversation:"Contacter ce professionnel", opening:"Ouverture…", conversationFailed:"Impossible d’ouvrir la conversation. Réessayez.",
+    confirm:"Confirmer", reject:"Refuser", accept:"Accepter", complete:"Terminer", cancel:"Annuler", cancelConfirm:"Confirmer l’annulation de cette demande ?", cancelling:"Annulation…", updateFailed:"La mise à jour n’a pas abouti. Réessayez.", cancelFailed:"L’annulation n’a pas abouti. Réessayez.",
+    status_requested:"En attente", status_confirmed:"Confirmé", status_rejected:"Refusé", status_cancelled:"Annulé", status_completed:"Terminé", status_accepted:"Acceptée", status_pending:"À examiner", status_in_review:"En cours d’examen", status_verified:"Vérifié par MedLink", status_suspended:"Suspendu",
+    acceptDocument:"Accepter le justificatif", rejectDocument:"Refuser le justificatif", openDocument:"Consulter le justificatif", adminSessionExpired:"Votre session administrateur a expiré.", decisionFailed:"La décision n’a pas pu être enregistrée.", noUploadedDocuments:"Aucun justificatif transmis.", 
+  },
+  en: {
+    authRequired:"Sign-in required", loginToContinue:"Sign in to access this area.", signIn:"Sign in",
+    requestAppointment:"Request an appointment", close:"Close", desiredDate:"Preferred date and time", chooseFuture:"Choose a future date and time.",
+    requestSent:"Your request has been sent. The professional must still confirm the appointment.", sendRequest:"Send request", sending:"Sending…", requestFailed:"Could not send the request. Please try again.",
+    createFollowUp:"Create a post-consultation follow-up", appointmentPatient:"Appointment / patient", chooseAppointment:"Choose an appointment", selectAppointment:"Select an existing appointment.",
+    followUpTitle:"Follow-up title", approvedInstructions:"Instructions approved by the professional", start:"Start", endOptional:"End (optional)", endAfterStart:"The end date must be after the start date.",
+    saveDraft:"Save draft", draftSaved:"Draft saved. Review it before publishing.", publishFollowUp:"Publish follow-up to patient space", followUpPublished:"Follow-up published to the patient space.", saveFailed:"Could not save the follow-up.", publishFailed:"Could not publish the follow-up.",
+    noAppointmentsForFollowUp:"An appointment is required before creating a follow-up.",
+    homeVisitTitle:"Request a home visit", noVerifiedDoctors:"No verified professional is available at the moment.", professional:"Professional", chooseProfessional:"Choose a professional", wilaya:"Wilaya", commune:"Commune", exactAddress:"Full address", reasonOptional:"Reason (optional)", addressPrivacy:"Your address is shared only with the selected professional to process this request.", reconnect:"Sign in again to continue.", homeVisitSent:"Your request has been sent to the selected professional.", homeVisitFailed:"The request could not be sent. Please try again.", transmitting:"Submitting…",
+    professionalDocuments:"Professional credentials", documentsHelp:"Upload a professional card, practice authorization or diploma. PDF, JPG or PNG; 10 MB maximum. These private documents are accessible only to you and authorized reviewers.",
+    documentType:"Document type", professionalCard:"Professional card", license:"Practice authorization / licence", diploma:"Diploma", file:"File", selectFile:"Please select a file.", fileTooLarge:"The file exceeds the 10 MB limit.", fileTypes:"Allowed formats: PDF, JPG or PNG.", upload:"Submit document", uploading:"Uploading…", uploadSuccess:"Document submitted to the secure verification area.", uploadFailed:"Document upload failed.", noDocuments:"No documents submitted.", reviewAccepted:"Credential accepted.", reviewRejected:"Credential rejected. A valid replacement may be requested.",
+    noMessages:"No messages yet. You can start the conversation.", messageLabel:"Your message", writeMessage:"Write a message…", send:"Send", messageSending:"Sending…", sessionExpired:"Your session has expired. Please sign in again.", messageFailed:"Message could not be sent. Please try again.",
+    openConversation:"Contact this professional", opening:"Opening…", conversationFailed:"Could not open the conversation. Please try again.",
+    confirm:"Confirm", reject:"Decline", accept:"Accept", complete:"Complete", cancel:"Cancel", cancelConfirm:"Are you sure you want to cancel this request?", cancelling:"Cancelling…", updateFailed:"The update could not be completed. Please try again.", cancelFailed:"Cancellation failed. Please try again.",
+    status_requested:"Pending", status_confirmed:"Confirmed", status_rejected:"Declined", status_cancelled:"Cancelled", status_completed:"Completed", status_accepted:"Accepted", status_pending:"Pending review", status_in_review:"Under review", status_verified:"Verified by MedLink", status_suspended:"Suspended",
+    acceptDocument:"Accept credential", rejectDocument:"Reject credential", openDocument:"View credential", adminSessionExpired:"Your administrator session has expired.", decisionFailed:"The decision could not be saved.", noUploadedDocuments:"No documents submitted.",
+  },
+  ar: {
+    authRequired:"يلزم تسجيل الدخول", loginToContinue:"سجّل الدخول للوصول إلى هذه المساحة.", signIn:"تسجيل الدخول",
+    requestAppointment:"طلب موعد", close:"إغلاق", desiredDate:"التاريخ والوقت المفضّلان", chooseFuture:"يرجى اختيار تاريخ ووقت في المستقبل.",
+    requestSent:"تم إرسال طلبك. يجب على المهني تأكيد الموعد.", sendRequest:"إرسال الطلب", sending:"جارٍ الإرسال…", requestFailed:"تعذّر إرسال الطلب. حاول مجدداً.",
+    createFollowUp:"إنشاء متابعة بعد الاستشارة", appointmentPatient:"الموعد / المريض", chooseAppointment:"اختر موعداً", selectAppointment:"يرجى اختيار موعد موجود.",
+    followUpTitle:"عنوان المتابعة", approvedInstructions:"تعليمات معتمدة من المهني", start:"البداية", endOptional:"النهاية (اختياري)", endAfterStart:"يجب أن يكون تاريخ النهاية بعد تاريخ البداية.",
+    saveDraft:"حفظ المسودة", draftSaved:"تم حفظ المسودة. راجعها قبل النشر.", publishFollowUp:"نشر المتابعة في مساحة المريض", followUpPublished:"تم نشر المتابعة في مساحة المريض.", saveFailed:"تعذّر حفظ المتابعة.", publishFailed:"تعذّر نشر المتابعة.",
+    noAppointmentsForFollowUp:"يجب وجود موعد قبل إنشاء متابعة.",
+    homeVisitTitle:"طلب زيارة منزلية", noVerifiedDoctors:"لا يوجد مهني تم التحقق منه متاح حالياً.", professional:"المهني", chooseProfessional:"اختر مهنياً", wilaya:"الولاية", commune:"البلدية", exactAddress:"العنوان الكامل", reasonOptional:"السبب (اختياري)", addressPrivacy:"لن تتم مشاركة عنوانك إلا مع المهني المعني لمعالجة الطلب.", reconnect:"يرجى تسجيل الدخول مجدداً للمتابعة.", homeVisitSent:"تم إرسال طلبك إلى المهني المحدد.", homeVisitFailed:"تعذّر إرسال الطلب. حاول مجدداً.", transmitting:"جارٍ الإرسال…",
+    professionalDocuments:"الوثائق المهنية", documentsHelp:"أرسل البطاقة المهنية أو ترخيص الممارسة أو الشهادة. الصيغ PDF أو JPG أو PNG، بحد أقصى 10 ميغابايت. هذه الوثائق خاصة ولا يطّلع عليها إلا أنت والمراجعون المخوّلون.",
+    documentType:"نوع الوثيقة", professionalCard:"البطاقة المهنية", license:"ترخيص / اعتماد الممارسة", diploma:"الشهادة", file:"الملف", selectFile:"يرجى اختيار ملف.", fileTooLarge:"يتجاوز الملف الحد الأقصى البالغ 10 ميغابايت.", fileTypes:"الصيغ المسموح بها: PDF أو JPG أو PNG.", upload:"إرسال الوثيقة", uploading:"جارٍ الإرسال…", uploadSuccess:"تم إرسال الوثيقة إلى مساحة التحقق الآمنة.", uploadFailed:"تعذّر إرسال الوثيقة.", noDocuments:"لم يتم إرسال أي وثيقة.",
+    reviewAccepted:"تم قبول الوثيقة.", reviewRejected:"تم رفض الوثيقة. قد يُطلب تقديم وثيقة صالحة.", noMessages:"لا توجد رسائل بعد. يمكنك بدء المحادثة.", messageLabel:"رسالتك", writeMessage:"اكتب رسالة…", send:"إرسال", messageSending:"جارٍ الإرسال…", sessionExpired:"انتهت جلستك. يرجى تسجيل الدخول مجدداً.", messageFailed:"تعذّر إرسال الرسالة. حاول مجدداً.",
+    openConversation:"التواصل مع هذا المهني", opening:"جارٍ الفتح…", conversationFailed:"تعذّر فتح المحادثة. حاول مجدداً.",
+    confirm:"تأكيد", reject:"رفض", accept:"قبول", complete:"إنهاء", cancel:"إلغاء", cancelConfirm:"هل تؤكد إلغاء هذا الطلب؟", cancelling:"جارٍ الإلغاء…", updateFailed:"تعذّر إتمام التحديث. حاول مجدداً.", cancelFailed:"تعذّر الإلغاء. حاول مجدداً.",
+    status_requested:"قيد الانتظار", status_confirmed:"مؤكد", status_rejected:"مرفوض", status_cancelled:"ملغى", status_completed:"مكتمل", status_accepted:"مقبول", status_pending:"بانتظار المراجعة", status_in_review:"قيد المراجعة", status_verified:"تم التحقق من MedLink", status_suspended:"موقوف",
+    acceptDocument:"قبول الوثيقة", rejectDocument:"رفض الوثيقة", openDocument:"عرض الوثيقة", adminSessionExpired:"انتهت جلسة المسؤول.", decisionFailed:"تعذّر حفظ القرار.", noUploadedDocuments:"لم يتم إرسال أي وثيقة.",
+  },
+} as const;
+
+export type MessageKey = keyof typeof messages.fr;
+export function tr(locale: string, key: MessageKey): string {
+  const language: Locale = locale === "ar" || locale === "en" ? locale : "fr";
+  return messages[language][key] ?? messages.fr[key];
+}
+export function localeTag(locale: string): string {
+  return locale === "ar" ? "ar-DZ" : locale === "en" ? "en-US" : "fr-DZ";
+}
