@@ -84,7 +84,7 @@ function retrieveApprovedPassages(question: string, instructions: string): strin
 export function answerFromCarePlan(message: string, context: CarePlanContext, locale: AgentLocale): AgentResult {
   const lang = copy[locale];
   const normalized = normalize(message);
-  const urgent = /(urgence|urgent|emergency|chest pain|difficulty breathing|cant breathe|shortness of breath|severe bleeding|unconscious|suicid|طوارئ|نزيف|صعوبة التنفس|ضيق التنفس|ألم شديد|فقدان الوعي)/i.test(normalized);
+  const urgent = /(urgence|urgent|emergency|chest pain|difficulty breathing|cant breathe|can t breathe|shortness of breath|severe bleeding|unconscious|suicid|طوارئ|نزيف|صعوبة التنفس|ضيق التنفس|ألم شديد|فقدان الوعي)/i.test(normalized);
   if (urgent) return { intent: "urgent_escalation", outcome: "human_handoff", answer: lang.urgent, handoff: true, safetyFlags: ["possible_urgent_symptom", "human_escalation"] };
 
   const clinical = /(diagnos|symptom|symptome|medicine|medication|drug|dose|dosage|pill|prescription|treatment|traitement|medicament|posologie|جرعة|دواء|تشخيص|علاج|أعراض|اعراض|وصفة|اعراض جانبية)/i.test(normalized);
