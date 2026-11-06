@@ -50,6 +50,6 @@ jobs:
       - name: Audit dependency vulnerabilities
         run: |
           npm audit --json > npm-audit.json || true
-          node -e 'const a=require("./npm-audit.json"); console.log(JSON.stringify({summary:a.metadata?.vulnerabilities, packages:Object.entries(a.vulnerabilities||{}).map(([name,v])=>({name,severity:v.severity,range:v.range,fixAvailable:v.fixAvailable}))},null,2))'
+          node -e 'const a=require("./npm-audit.json"); console.log(JSON.stringify({summary:a.metadata?.vulnerabilities, packages:Object.entries(a.vulnerabilities||{}).map(([name,v])=>({name,severity:v.severity,range:v.range,fixAvailable:v.fixAvailable,effects:v.effects,via:v.via?.map(x=>typeof x==="string"?x:{name:x.name,title:x.title,url:x.url,range:x.range})}))},null,2))'
       - name: Verify production build
         run: npm run build
