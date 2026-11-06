@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       answer:result.answer,
       handoff:result.handoff,
       intent:result.intent,
-      source:"approved_plan"
+      source:result.outcome==="answered_from_plan"?"approved_plan":"safety_policy"
     });
   } catch {
     return NextResponse.json({error:"agent_unavailable"}, {status:503});
