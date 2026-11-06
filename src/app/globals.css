@@ -60,3 +60,25 @@ button:focus-visible,a:focus-visible{outline:3px solid #4b9a7d66;outline-offset:
 .directory-cta h3{font-size:16px;margin:0 0 5px}
 .directory-cta p{font-size:13px;color:var(--muted);line-height:1.7;margin:0}
 @media(max-width:560px){.directory-cta{align-items:stretch;flex-direction:column}.directory-cta .btn{width:100%}}
+
+/* Phase 6: consultation, care-plan assistant and notification states */
+.notification-item{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.notification-item:last-child{border-bottom:0}
+.notification-content{min-width:0;flex:1}
+.notification-content>strong{display:block;font-size:14px}
+.notification-content>p{margin:5px 0;color:var(--muted);font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.notification-content>small{color:var(--muted);font-size:11px}
+.notification-state{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.notification-state>small{font-size:11px;color:var(--muted)}
+.notification-dot{display:inline-block;width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#2e9b73}
+.is-read .notification-dot{background:#aeb9b2}
+.notification-read{font-size:11px;padding:7px 9px;min-height:30px}
+.agent-message{max-width:90%;padding:11px 13px;border-radius:14px;background:#f2f6f2;border:1px solid var(--line);overflow-wrap:anywhere}
+.agent-message.user{margin-inline-start:auto;background:#e7f4ee}
+.agent-message.assistant.handoff{border-color:#d6a45a;background:#fff9ed}
+.agent-message p{margin:0;white-space:pre-wrap;line-height:1.65;font-size:13px}
+.agent-messages{display:grid;gap:9px;max-height:340px;overflow:auto}
+[dir=rtl] .notification-item{flex-direction:row-reverse}
+[dir=rtl] .notification-state{justify-content:flex-start}
+[dir=rtl] .agent-message p{text-align:right}
+@media(max-width:560px){.notification-item{flex-direction:column}.notification-state{justify-content:flex-start}.notification-read{width:100%}}
