@@ -11,8 +11,10 @@ export default function CarePlanAgent({planId,locale}:{planId:string;locale:stri
    const response=await fetch("/api/agent/follow-up",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({planId,message:question,locale})});
    const data=await response.json() as {answer?:string;handoff?:boolean};
    if(response.status===429){setError(tr(locale,"agentRateLimited"));return;}
-   if(!response.ok||typeof data.answer!=="string")throw new Error("agent");
-   setMessages(old=>[...old,{role:"assistant",content:data.answer,handoff:!!data.handoff}]);
+   if(!response.ok)throw new Error("agent");
+   const answer=data.answer;
+   if(typeof answer!=="string")throw new Error("agent");
+   setMessages(old=>[...old,{role:"assistant",content:answer,handoff:!!data.handoff}]);
   }catch{setError(tr(locale,"agentError"));}
   finally{setBusy(false);}
  }
