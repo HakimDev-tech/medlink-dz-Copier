@@ -17,6 +17,12 @@ Copier `.env.example` vers `.env.local` et renseigner :
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
+Pour synchroniser un environnement de base de données avec les migrations versionnées du dépôt :
+```bash
+supabase link --project-ref cftaxeibbvjryrufahlo
+supabase db push
+```
+
 Ne jamais exposer une clé `service_role` ou `sb_secret_*` dans le navigateur ou une variable `NEXT_PUBLIC_*`.
 
 ## Parcours de consultation et suivi — Phase 6
