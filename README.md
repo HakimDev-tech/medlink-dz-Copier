@@ -9,7 +9,7 @@ MVP produit de coordination du parcours de soins en Algérie, disponible en fran
 
 ## Développement local
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
