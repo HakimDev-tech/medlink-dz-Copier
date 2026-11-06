@@ -58,6 +58,12 @@ test("recognizes common French emergency wording",()=>{
   assert.equal(result.handoff,true);
 });
 
+test("recognizes Arabic breathing emergency wording",()=>{
+  const result=answerFromCarePlan("لا أستطيع التنفس",context,"ar");
+  assert.equal(result.intent,"urgent_escalation");
+  assert.equal(result.handoff,true);
+});
+
 test("flags potential emergencies without attempting assessment",()=>{
   const result=answerFromCarePlan("I have chest pain and difficulty breathing",context,"en");
   assert.equal(result.intent,"urgent_escalation");
