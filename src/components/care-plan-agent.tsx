@@ -12,7 +12,7 @@ export default function CarePlanAgent({planId,locale}:{planId:string;locale:stri
    const data=await response.json() as {answer?:string;handoff?:boolean};
    if(response.status===429){setError(tr(locale,"agentRateLimited"));return;}
    if(!response.ok||typeof data.answer!=="string")throw new Error("agent");
-   setMessages(old=>[...old,{role:"assistant",content:data.answer+(data.handoff?"\n\n"+tr(locale,"agentHandoff"):""),handoff:!!data.handoff}]);
+   setMessages(old=>[...old,{role:"assistant",content:data.answer,handoff:!!data.handoff}]);
   }catch{setError(tr(locale,"agentError"));}
   finally{setBusy(false);}
  }
