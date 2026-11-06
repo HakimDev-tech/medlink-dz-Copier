@@ -1,19 +1,9 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-export default function AppointmentActions({id,status}:{id:string;status:string}) {
- const [busy,setBusy]=useState(false);const [error,setError]=useState("");const router=useRouter();
- async function change(next:"confirmed"|"rejected"|"completed") {
-  setBusy(true);setError("");
-  try {const supabase=createClient();const {error:writeError}=await supabase.from("appointments").update({status:next}).eq("id",id);if(writeError)throw writeError;router.refresh();}
-  catch(e){setError(e instanceof Error?e.message:"Mise à jour impossible.");}
-  finally{setBusy(false);}
- }
- if(status==="completed"||status==="cancelled"||status==="rejected")return <span className="tag">{status}</span>;
- return <div style={{display:"flex",gap:6,flexWrap:"wrap",justifyContent:"end"}}>
-  {status==="requested"&&<><button className="btn soft" type="button" disabled={busy} onClick={()=>change("confirmed")}>Confirmer</button><button className="btn quiet" type="button" disabled={busy} onClick={()=>change("rejected")}>Refuser</button></>}
-  {status==="confirmed"&&<button className="btn soft" type="button" disabled={busy} onClick={()=>change("completed")}>Terminer</button>}
-  {error&&<small role="alert" style={{color:"#a33"}}>{error}</small>}
- </div>;
+import {useState} from "react";import {useRouter} from "next/navigation";import {createClient} from "@/lib/supabase/client";import {tr} from "@/lib/i18n";
+export default function AppointmentActions({id,status,locale}:{id:string;status:string;locale:string}){
+ const [busy,setBusy]=useState(false),[error,setError]=useState("");const router=useRouter();
+ async function change(next:"confirmed"|"rejected"|"completed"){setBusy(true);setError("");try{const supabase=createClient(),{error}=await supabase.from("appointments").update({status:next}).eq("id",id);if(error)throw error;router.refresh();}catch{setError(tr(locale,"updateFailed"));}finally{setBusy(false);}}
+ const label=(s:string)=>tr(locale,("status_"+s) as Parameters<typeof tr>[1]);
+ if(status==="completed"||status==="cancelled"||status==="rejected")return <span className="tag">{label(status)}</span>;
+ return <div className="action-group">{status==="requested"&&<><button className="btn soft" type="button" disabled={busy} onClick={()=>change("confirmed")}>{tr(locale,"confirm")}</button><button className="btn quiet" type="button" disabled={busy} onClick={()=>change("rejected")}>{tr(locale,"reject")}</button></>}{status==="confirmed"&&<button className="btn soft" type="button" disabled={busy} onClick={()=>change("completed")}>{tr(locale,"complete")}</button>}{error&&<small role="alert" className="form-error">{error}</small>}</div>;
 }
