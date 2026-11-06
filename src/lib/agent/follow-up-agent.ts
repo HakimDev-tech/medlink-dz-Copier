@@ -1,20 +1,100 @@
-export type CarePlanContext={title:string;instructions:string;starts_on:string;ends_on:string|null;events:Array<{event_at:string;label:string;instruction:string|null}>};
-export type AgentLocale="fr"|"en"|"ar";
-export type AgentResult={intent:"plan_lookup"|"schedule_lookup"|"out_of_scope"|"urgent_escalation"|"unknown";outcome:"answered_from_plan"|"human_handoff"|"refused";answer:string;handoff:boolean;safetyFlags:string[]};
-const copy={
- fr:{urgent:"Votre message peut nécessiter une évaluation rapide. Je ne peux pas évaluer une urgence. Contactez immédiatement les services d’urgence locaux ou votre professionnel de santé. Votre demande est signalée pour suivi.",out:"Je ne peux pas donner de diagnostic, recommander un médicament, modifier une dose ou proposer un traitement. Je peux uniquement clarifier le programme validé et ses rappels. Votre professionnel doit répondre à cette demande.",plan:(t:string,i:string)=>"Programme : "+t+"\nConsignes validées :\n"+i,schedule:(events:Array<{event_at:string;label:string;instruction:string|null}>)=>events.length?"Rappels programmés :\n"+events.map(e=>"• "+e.label+" — "+new Date(e.event_at).toLocaleString("fr-DZ")+(e.instruction?"\n  "+e.instruction:"")).join("\n"):"Aucun rappel futur n’est enregistré dans ce programme.",unknown:"Je ne trouve pas cette information dans le programme publié. Contactez votre professionnel pour confirmation."},
- en:{urgent:"Your message may require prompt assessment. I cannot assess emergencies. Contact local emergency services or your healthcare professional immediately. Your request has been flagged for follow-up.",out:"I cannot diagnose, recommend medication, change a dose, or suggest treatment. I can only clarify the approved plan and its reminders. Your healthcare professional must answer this request.",plan:(t:string,i:string)=>"Plan: "+t+"\nApproved instructions:\n"+i,schedule:(events:Array<{event_at:string;label:string;instruction:string|null}>)=>events.length?"Scheduled reminders:\n"+events.map(e=>"• "+e.label+" — "+new Date(e.event_at).toLocaleString("en-US")+(e.instruction?"\n  "+e.instruction:"")).join("\n"):"No future reminder is registered in this plan.",unknown:"I cannot find this information in the published plan. Please contact your healthcare professional to confirm."},
- ar:{urgent:"قد تتطلب رسالتك تقييماً عاجلاً. لا يمكنني تقييم الحالات الطارئة. اتصل فوراً بخدمات الطوارئ المحلية أو بالمهني الصحي. تمت إحالة طلبك للمتابعة.",out:"لا يمكنني تقديم تشخيص أو اقتراح دواء أو تغيير جرعة أو وصف علاج. يمكنني فقط توضيح البرنامج المعتمد وتذكيراته. يجب أن يجيب المهني الصحي عن هذا الطلب.",plan:(t:string,i:string)=>"البرنامج: "+t+"\nالتعليمات المعتمدة:\n"+i,schedule:(events:Array<{event_at:string;label:string;instruction:string|null}>)=>events.length?"التذكيرات المجدولة:\n"+events.map(e=>"• "+e.label+" — "+new Date(e.event_at).toLocaleString("ar-DZ")+(e.instruction?"\n  "+e.instruction:"")).join("\n"):"لا يوجد تذكير مستقبلي مسجل في هذا البرنامج.",unknown:"لم أجد هذه المعلومة في البرنامج المنشور. يرجى التواصل مع المهني الصحي للتأكيد."}
+export type CarePlanContext = {
+  title: string;
+  instructions: string;
+  starts_on: string;
+  ends_on: string | null;
+  events: Array<{ event_at: string; label: string; instruction: string | null }>;
 };
-export function answerFromCarePlan(message:string,context:CarePlanContext,locale:AgentLocale):AgentResult{
- const lang=copy[locale],m=message.toLocaleLowerCase();
- const urgent=/(urgence|urgent|emergency|chest pain|difficulty breathing|can't breathe|severe bleeding|unconscious|suicid|طوارئ|نزيف|صعوبة التنفس|ألم شديد|فقدان الوعي)/i.test(m);
- if(urgent)return {intent:"urgent_escalation",outcome:"human_handoff",answer:lang.urgent,handoff:true,safetyFlags:["possible_urgent_symptom","human_escalation"]};
- const clinical=/(diagnos|symptom|sympt[oô]me|medicine|medication|drug|dose|dosage|pill|prescription|treatment|traitement|médicament|posologie|جرعة|دواء|تشخيص|علاج|أعراض|وصفة)/i.test(m);
- if(clinical)return {intent:"out_of_scope",outcome:"human_handoff",answer:lang.out,handoff:true,safetyFlags:["clinical_advice_blocked","human_escalation"]};
- const schedule=/(remind|reminder|schedule|when|date|time|rappel|rappeler|quand|horaire|date|وقت|موعد|تذكير)/i.test(m);
- if(schedule)return {intent:"schedule_lookup",outcome:"answered_from_plan",answer:lang.schedule(context.events),handoff:false,safetyFlags:[]};
- const plan=/(instruction|consigne|plan|programme|follow.?up|suivi|should i|what do i|تعليمات|برنامج|متابعة)/i.test(m);
- if(plan&&context.instructions.trim())return {intent:"plan_lookup",outcome:"answered_from_plan",answer:lang.plan(context.title,context.instructions),handoff:false,safetyFlags:[]};
- return {intent:"unknown",outcome:"refused",answer:lang.unknown,handoff:false,safetyFlags:["answer_not_in_approved_context"]};
+export type AgentLocale = "fr" | "en" | "ar";
+export type AgentResult = {
+  intent: "plan_lookup" | "schedule_lookup" | "out_of_scope" | "urgent_escalation" | "unknown";
+  outcome: "answered_from_plan" | "human_handoff" | "refused";
+  answer: string;
+  handoff: boolean;
+  safetyFlags: string[];
+};
+
+const copy = {
+  fr: {
+    urgent: "Votre message peut nécessiter une évaluation rapide. Je ne peux pas évaluer une urgence. Contactez immédiatement les services d’urgence locaux ou votre professionnel de santé. Votre demande a été signalée au professionnel.",
+    out: "Je ne peux pas établir de diagnostic, interpréter des symptômes, recommander un médicament, modifier une dose ou proposer un traitement. Votre professionnel de santé doit répondre à cette demande. Elle lui a été signalée.",
+    schedule: (events: CarePlanContext["events"]) => events.length
+      ? "Rappels enregistrés dans votre programme :\n" + events.map(e => "• " + e.label + " — " + new Date(e.event_at).toLocaleString("fr-DZ") + (e.instruction ? "\n  " + e.instruction : "")).join("\n")
+      : "Aucun rappel futur n’est enregistré dans ce programme.",
+    found: (snippets: string[]) => "Voici les passages correspondants de votre programme validé :\n" + snippets.map(s => "• " + s).join("\n"),
+    unknown: "Je ne trouve pas cette information dans les consignes publiées. Je préfère ne pas l’interpréter. Contactez votre professionnel pour confirmation."
+  },
+  en: {
+    urgent: "Your message may require prompt assessment. I cannot assess emergencies. Contact local emergency services or your healthcare professional immediately. Your request has been flagged for the professional.",
+    out: "I cannot diagnose, interpret symptoms, recommend medication, change a dose, or suggest treatment. Your healthcare professional must answer this request. It has been flagged for them.",
+    schedule: (events: CarePlanContext["events"]) => events.length
+      ? "Reminders registered in your plan:\n" + events.map(e => "• " + e.label + " — " + new Date(e.event_at).toLocaleString("en-US") + (e.instruction ? "\n  " + e.instruction : "")).join("\n")
+      : "No future reminder is registered in this plan.",
+    found: (snippets: string[]) => "Relevant passages from your approved plan:\n" + snippets.map(s => "• " + s).join("\n"),
+    unknown: "I cannot find this information in the published instructions, so I will not infer an answer. Please contact your healthcare professional to confirm."
+  },
+  ar: {
+    urgent: "قد تتطلب رسالتك تقييماً عاجلاً. لا يمكنني تقييم الحالات الطارئة. اتصل فوراً بخدمات الطوارئ المحلية أو بالمهني الصحي. تمت إحالة طلبك إلى المهني.",
+    out: "لا يمكنني التشخيص أو تفسير الأعراض أو اقتراح دواء أو تغيير جرعة أو تقديم علاج. يجب أن يجيب المهني الصحي عن هذا الطلب. تمت إحالته إليه.",
+    schedule: (events: CarePlanContext["events"]) => events.length
+      ? "التذكيرات المسجلة في برنامجك:\n" + events.map(e => "• " + e.label + " — " + new Date(e.event_at).toLocaleString("ar-DZ") + (e.instruction ? "\n  " + e.instruction : "")).join("\n")
+      : "لا يوجد تذكير مستقبلي مسجل في هذا البرنامج.",
+    found: (snippets: string[]) => "المقاطع المطابقة من برنامجك المعتمد:\n" + snippets.map(s => "• " + s).join("\n"),
+    unknown: "لم أجد هذه المعلومة في التعليمات المنشورة، لذلك لن أستنتج إجابة. يرجى التواصل مع المهني الصحي للتأكيد."
+  }
+} as const;
+
+const stopWords = new Set([
+  "a","à","au","aux","avec","ce","ces","dans","de","des","du","elle","en","et","il","je","la","le","les","ma","mais","me","mon","ou","par","pas","pour","que","quel","quelle","quels","quelles","qui","sa","se","son","sur","un","une","vos","votre","mes","est","dois","doit","faire","comment","quoi","quand","où","the","a","an","and","are","as","at","be","can","do","does","for","from","how","i","in","is","it","my","of","on","or","please","should","the","to","what","when","where","which","with","your","you","هل","ما","ماذا","كيف","متى","أين","من","في","على","إلى","عن","هذا","هذه","هو","هي","هل","و","من","مع","لي","لدي"
+]);
+
+function normalize(value: string): string {
+  return value.toLocaleLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u064B-\u065F\u0670]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function tokens(value: string): string[] {
+  return [...new Set(normalize(value).split(" ").filter(t => t.length > 1 && !stopWords.has(t)))];
+}
+function retrieveApprovedPassages(question: string, instructions: string): string[] {
+  const queryTokens = tokens(question);
+  if (queryTokens.length === 0) return [];
+  const chunks = instructions
+    .split(/\n+|(?<=[.!?؟؛])\s+/u)
+    .map(part => part.replace(/^\s*[-•*\d.)]+\s*/, "").trim())
+    .filter(part => part.length >= 12);
+  const ranked = chunks.map((text, index) => {
+    const chunkTokens = new Set(tokens(text));
+    const overlap = queryTokens.filter(token => chunkTokens.has(token)).length;
+    const coverage = overlap / queryTokens.length;
+    return { text, index, overlap, coverage };
+  }).filter(item => item.overlap > 0)
+    .sort((a, b) => b.coverage - a.coverage || b.overlap - a.overlap || a.index - b.index);
+  if (!ranked.length) return [];
+  const best = ranked[0];
+  // Conservative lexical retrieval: require at least two shared terms or a strong single-token match.
+  if (best.overlap < 2 && (queryTokens.length > 1 || best.coverage < 1)) return [];
+  return ranked.filter(item => item.coverage >= Math.max(0.5, best.coverage - 0.2)).slice(0, 4).map(item => item.text);
+}
+
+export function answerFromCarePlan(message: string, context: CarePlanContext, locale: AgentLocale): AgentResult {
+  const lang = copy[locale];
+  const normalized = normalize(message);
+  const urgent = /(urgence|urgent|emergency|chest pain|difficulty breathing|cant breathe|shortness of breath|severe bleeding|unconscious|suicid|طوارئ|نزيف|صعوبة التنفس|ضيق التنفس|ألم شديد|فقدان الوعي)/i.test(normalized);
+  if (urgent) return { intent: "urgent_escalation", outcome: "human_handoff", answer: lang.urgent, handoff: true, safetyFlags: ["possible_urgent_symptom", "human_escalation"] };
+
+  const clinical = /(diagnos|symptom|symptome|medicine|medication|drug|dose|dosage|pill|prescription|treatment|traitement|medicament|posologie|جرعة|دواء|تشخيص|علاج|أعراض|اعراض|وصفة|اعراض جانبية)/i.test(normalized);
+  if (clinical) return { intent: "out_of_scope", outcome: "human_handoff", answer: lang.out, handoff: true, safetyFlags: ["clinical_advice_blocked", "human_escalation"] };
+
+  const schedule = /(remind|reminder|schedule|when|date|time|rappel|rappeler|quand|horaire|date|وقت|موعد|تذكير|التذكير)/i.test(normalized);
+  if (schedule) return { intent: "schedule_lookup", outcome: "answered_from_plan", answer: lang.schedule(context.events), handoff: false, safetyFlags: [] };
+
+  const passages = retrieveApprovedPassages(message, context.instructions);
+  if (passages.length) return { intent: "plan_lookup", outcome: "answered_from_plan", answer: lang.found(passages), handoff: false, safetyFlags: [] };
+
+  return { intent: "unknown", outcome: "refused", answer: lang.unknown, handoff: false, safetyFlags: ["answer_not_found_in_approved_plan"] };
 }
