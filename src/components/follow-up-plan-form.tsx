@@ -3,9 +3,16 @@ import {useState,type FormEvent} from "react";
 import {createClient} from "@/lib/supabase/client";
 import {localeTag,tr} from "@/lib/i18n";
 type AppointmentOption={id:string;patient_id:string;starts_at:string};
-type EventOption={id:string;event_at:string;label:string;instruction:string|null};
-export default function FollowUpPlanForm({doctorId,appointments,locale}:{doctorId:string;appointments:AppointmentOption[];locale:string}){
- const [busy,setBusy]=useState(false),[message,setMessage]=useState(""),[draftId,setDraftId]=useState<string|null>(null),[events,setEvents]=useState<EventOption[]>([]);
+type DraftOption={id:string;appointment_id:string|null;patient_id:string;title:string;instructions:string;starts_on:string;ends_on:string|null};
+type EventOption={id:string;plan_id:string;event_at:string;label:string;instruction:string|null};
+export default function FollowUpPlanForm({doctorId,appointments,initialDrafts=[],initialEvents=[],locale}:{doctorId:string;appointments:AppointmentOption[];initialDrafts?:DraftOption[];initialEvents?:EventOption[];locale:string}){
+ const [busy,setBusy]=useState(false),[message,setMessage]=useState(""),[draftId,setDraftId]=useState<string|null>(null),[selectedDraft,setSelectedDraft]=useState<DraftOption|null>(null),[drafts,setDrafts]=useState(initialDrafts),[events,setEvents]=useState<EventOption[]>([]);
+ function selectDraft(id:string){
+  const draft=drafts.find(item=>item.id===id)||null;
+  setDraftId(draft?.id||null);setSelectedDraft(draft);
+  setEvents(draft?initialEvents.filter(item=>item.plan_id===draft.id):[]);
+  setMessage("");
+ }
  async function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();const form=new FormData(event.currentTarget),appointment=draftId?null:appointments.find(a=>a.id===String(form.get("appointment")||""));
   if(!draftId&&!appointment){setMessage(tr(locale,"selectAppointment"));return;}
@@ -19,11 +26,13 @@ export default function FollowUpPlanForm({doctorId,appointments,locale}:{doctorI
    if(draftId){
     const {error}=await supabase.from("follow_up_plans").update({title,instructions,starts_on:start,ends_on:end||null}).eq("id",draftId).eq("status","draft");
     if(error)throw error;
-    setMessage(tr(locale,"draftUpdated"));
+    const updated={...selectedDraft!,title,instructions,starts_on:start,ends_on:end||null};
+    setSelectedDraft(updated);setDrafts(old=>old.map(item=>item.id===draftId?updated:item));setMessage(tr(locale,"draftUpdated"));
    }else{
     const {data,error}=await supabase.from("follow_up_plans").insert({doctor_id:doctorId,patient_id:appointment!.patient_id,appointment_id:appointment!.id,title,instructions,starts_on:start,ends_on:end||null,status:"draft"}).select("id").single();
     if(error)throw error;
-    setDraftId(data.id);setEvents([]);setMessage(tr(locale,"draftSaved"));
+    const created:DraftOption={id:data.id,appointment_id:appointment!.id,patient_id:appointment!.patient_id,title,instructions,starts_on:start,ends_on:end||null};
+    setDraftId(data.id);setSelectedDraft(created);setDrafts(old=>[created,...old]);setEvents([]);setMessage(tr(locale,"draftSaved"));
    }
   }catch{setMessage(tr(locale,"saveFailed"));}finally{setBusy(false);}
  }
@@ -34,7 +43,7 @@ export default function FollowUpPlanForm({doctorId,appointments,locale}:{doctorI
   setBusy(true);setMessage("");
   try{
    const supabase=createClient();
-   const {data,error}=await supabase.from("follow_up_events").insert({plan_id:draftId,event_at:at.toISOString(),label,instruction:instruction||null}).select("id,event_at,label,instruction").single();
+   const {data,error}=await supabase.from("follow_up_events").insert({plan_id:draftId,event_at:at.toISOString(),label,instruction:instruction||null}).select("id,plan_id,event_at,label,instruction").single();
    if(error)throw error;setEvents(old=>[...old,data]);el.reset();setMessage(tr(locale,"eventAdded"));
   }catch{setMessage(tr(locale,"eventFailed"));}finally{setBusy(false);}
  }
@@ -50,16 +59,18 @@ export default function FollowUpPlanForm({doctorId,appointments,locale}:{doctorI
   setBusy(true);setMessage("");
   try{
    const supabase=createClient();const {error}=await supabase.from("follow_up_plans").update({status:"published",approved_at:new Date().toISOString()}).eq("id",draftId).eq("status","draft");
-   if(error)throw error;setMessage(tr(locale,"followUpPublished"));setDraftId(null);setEvents([]);
+   if(error)throw error;setMessage(tr(locale,"followUpPublished"));setDrafts(old=>old.filter(item=>item.id!==draftId));setDraftId(null);setSelectedDraft(null);setEvents([]);
   }catch{setMessage(tr(locale,"publishFailed"));}finally{setBusy(false);}
  }
+ const hasDrafts=drafts.length>0;
  return <section className="panel component-stack">
   <h2>{tr(locale,"createFollowUp")}</h2>
-  {appointments.length===0?<p className="muted">{tr(locale,"noAppointmentsForFollowUp")}</p>:<form onSubmit={submit} className="form-stack">
-   <div className="input"><label>{tr(locale,"appointmentPatient")}</label><select name="appointment" required defaultValue="" disabled={!!draftId}><option value="" disabled>{tr(locale,"chooseAppointment")}</option>{appointments.map(a=><option key={a.id} value={a.id}>Patient #{a.patient_id.slice(0,8)} · {new Date(a.starts_at).toLocaleString(localeTag(locale))}</option>)}</select></div>
-   <div className="input"><label>{tr(locale,"followUpTitle")}</label><input name="title" required maxLength={120}/></div>
-   <div className="input"><label>{tr(locale,"approvedInstructions")}</label><textarea name="instructions" required rows={4} maxLength={3000}/></div>
-   <div className="two"><div className="input"><label>{tr(locale,"start")}</label><input type="date" name="starts_on" required/></div><div className="input"><label>{tr(locale,"endOptional")}</label><input type="date" name="ends_on"/></div></div>
+  {hasDrafts&&<div className="input"><label>{tr(locale,"resumeDraft")}</label><select value={draftId||""} onChange={e=>selectDraft(e.target.value)}><option value="">{tr(locale,"newDraft")}</option>{drafts.map(d=><option key={d.id} value={d.id}>{d.title} · {d.starts_on}</option>)}</select></div>}
+  {appointments.length===0&&!draftId?<p className="muted">{tr(locale,"noAppointmentsForFollowUp")}</p>:<form key={draftId||"new-draft"} onSubmit={submit} className="form-stack">
+   <div className="input"><label>{tr(locale,"appointmentPatient")}</label><select name="appointment" required defaultValue={selectedDraft?.appointment_id||""} disabled={!!draftId}><option value="" disabled>{tr(locale,"chooseAppointment")}</option>{appointments.map(a=><option key={a.id} value={a.id}>Patient #{a.patient_id.slice(0,8)} · {new Date(a.starts_at).toLocaleString(localeTag(locale))}</option>)}</select></div>
+   <div className="input"><label>{tr(locale,"followUpTitle")}</label><input name="title" required maxLength={120} defaultValue={selectedDraft?.title||""}/></div>
+   <div className="input"><label>{tr(locale,"approvedInstructions")}</label><textarea name="instructions" required rows={4} maxLength={3000} defaultValue={selectedDraft?.instructions||""}/></div>
+   <div className="two"><div className="input"><label>{tr(locale,"start")}</label><input type="date" name="starts_on" required defaultValue={selectedDraft?.starts_on||""}/></div><div className="input"><label>{tr(locale,"endOptional")}</label><input type="date" name="ends_on" defaultValue={selectedDraft?.ends_on||""}/></div></div>
    <button className="btn primary" type="submit" disabled={busy}>{busy?tr(locale,"sending"):draftId?tr(locale,"updateDraft"):tr(locale,"saveDraft")}</button>
   </form>}
   {draftId&&<div className="component-stack"><h3>{tr(locale,"events")}</h3>
