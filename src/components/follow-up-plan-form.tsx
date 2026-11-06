@@ -6,11 +6,11 @@ type AppointmentOption={id:string;patient_id:string;starts_at:string};
 type DraftOption={id:string;appointment_id:string|null;patient_id:string;title:string;instructions:string;starts_on:string;ends_on:string|null};
 type EventOption={id:string;plan_id:string;event_at:string;label:string;instruction:string|null};
 export default function FollowUpPlanForm({doctorId,appointments,initialDrafts=[],initialEvents=[],locale}:{doctorId:string;appointments:AppointmentOption[];initialDrafts?:DraftOption[];initialEvents?:EventOption[];locale:string}){
- const [busy,setBusy]=useState(false),[message,setMessage]=useState(""),[draftId,setDraftId]=useState<string|null>(null),[selectedDraft,setSelectedDraft]=useState<DraftOption|null>(null),[drafts,setDrafts]=useState(initialDrafts),[events,setEvents]=useState<EventOption[]>([]);
+ const [busy,setBusy]=useState(false),[message,setMessage]=useState(""),[draftId,setDraftId]=useState<string|null>(null),[selectedDraft,setSelectedDraft]=useState<DraftOption|null>(null),[drafts,setDrafts]=useState(initialDrafts),[allDraftEvents,setAllDraftEvents]=useState(initialEvents),[events,setEvents]=useState<EventOption[]>([]);
  function selectDraft(id:string){
   const draft=drafts.find(item=>item.id===id)||null;
   setDraftId(draft?.id||null);setSelectedDraft(draft);
-  setEvents(draft?initialEvents.filter(item=>item.plan_id===draft.id):[]);
+  setEvents(draft?allDraftEvents.filter(item=>item.plan_id===draft.id):[]);
   setMessage("");
  }
  async function submit(event:FormEvent<HTMLFormElement>){
@@ -44,14 +44,14 @@ export default function FollowUpPlanForm({doctorId,appointments,initialDrafts=[]
   try{
    const supabase=createClient();
    const {data,error}=await supabase.from("follow_up_events").insert({plan_id:draftId,event_at:at.toISOString(),label,instruction:instruction||null}).select("id,plan_id,event_at,label,instruction").single();
-   if(error)throw error;setEvents(old=>[...old,data]);el.reset();setMessage(tr(locale,"eventAdded"));
+   if(error)throw error;setEvents(old=>[...old,data]);setAllDraftEvents(old=>[...old,data]);el.reset();setMessage(tr(locale,"eventAdded"));
   }catch{setMessage(tr(locale,"eventFailed"));}finally{setBusy(false);}
  }
  async function removeEvent(id:string){
   if(!draftId||busy)return;setBusy(true);setMessage("");
   try{
    const supabase=createClient();const {error}=await supabase.from("follow_up_events").delete().eq("id",id).eq("plan_id",draftId);
-   if(error)throw error;setEvents(old=>old.filter(item=>item.id!==id));setMessage(tr(locale,"eventRemoved"));
+   if(error)throw error;setEvents(old=>old.filter(item=>item.id!==id));setAllDraftEvents(old=>old.filter(item=>item.id!==id));setMessage(tr(locale,"eventRemoved"));
   }catch{setMessage(tr(locale,"eventFailed"));}finally{setBusy(false);}
  }
  async function publish(){
@@ -59,7 +59,7 @@ export default function FollowUpPlanForm({doctorId,appointments,initialDrafts=[]
   setBusy(true);setMessage("");
   try{
    const supabase=createClient();const {error}=await supabase.from("follow_up_plans").update({status:"published",approved_at:new Date().toISOString()}).eq("id",draftId).eq("status","draft");
-   if(error)throw error;setMessage(tr(locale,"followUpPublished"));setDrafts(old=>old.filter(item=>item.id!==draftId));setDraftId(null);setSelectedDraft(null);setEvents([]);
+   if(error)throw error;setMessage(tr(locale,"followUpPublished"));setDrafts(old=>old.filter(item=>item.id!==draftId));setAllDraftEvents(old=>old.filter(item=>item.plan_id!==draftId));setDraftId(null);setSelectedDraft(null);setEvents([]);
   }catch{setMessage(tr(locale,"publishFailed"));}finally{setBusy(false);}
  }
  const hasDrafts=drafts.length>0;
