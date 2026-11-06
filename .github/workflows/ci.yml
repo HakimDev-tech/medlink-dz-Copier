@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: medlink-ci-${{ github.ref }}
@@ -29,5 +29,16 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Commit npm lockfile when missing
+        run: |
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "No lockfile changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(deps): commit reproducible npm lockfile [skip ci]"
+          git push origin HEAD:main
       - name: Verify production build
         run: npm run build
