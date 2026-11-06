@@ -90,10 +90,10 @@ export function answerFromCarePlan(message: string, context: CarePlanContext, lo
   const greeting = /^(bonjour|bonsoir|salut|hello|hi|hey|good morning|good evening|merci|thanks|thank you|شكرا|السلام عليكم|مرحبا)$/i.test(normalized);
   if (greeting) return { intent: "unknown", outcome: "refused", answer: lang.greeting, handoff: false, safetyFlags: [] };
 
-  const urgent = /(urgence|urgent|emergency|chest pain|difficulty breathing|cant breathe|can t breathe|shortness of breath|severe bleeding|unconscious|suicid|طوارئ|نزيف|صعوبة التنفس|ضيق التنفس|ألم شديد|فقدان الوعي)/i.test(normalized);
+  const urgent = /(urgence|urgent|emergency|chest pain|pain in chest|difficulty breathing|cant breathe|can t breathe|shortness of breath|severe bleeding|heavy bleeding|unconscious|loss of consciousness|fainting|seizure|convulsion|stroke|face droop|one sided weakness|severe allergic reaction|anaphylaxis|suicid|douleur thoracique|perte de connaissance|convulsion|saignement abondant|faiblesse soudaine|reaction allergique grave|réaction allergique grave|افكار انتحارية|أفكار انتحارية|طوارئ|نزيف حاد|نزيف شديد|صعوبة التنفس|ضيق التنفس|ألم في الصدر|فقدان الوعي|تشنج|سكتة دماغية|ضعف مفاجئ|حساسية شديدة)/i.test(normalized);
   if (urgent) return { intent: "urgent_escalation", outcome: "human_handoff", answer: lang.urgent, handoff: true, safetyFlags: ["possible_urgent_symptom", "human_escalation"] };
 
-  const clinical = /(diagnos|symptom|symptome|medicine|medication|drug|dose|dosage|pill|prescription|treatment|traitement|medicament|posologie|جرعة|دواء|تشخيص|علاج|أعراض|اعراض|وصفة|اعراض جانبية)/i.test(normalized);
+  const clinical = /(diagnos|symptom|symptome|medicine|medication|drug|dose|dosage|pill|prescription|treatment|traitement|medicament|posologie|pain|fever|rash|headache|vomit|nausea|diarrhea|blood pressure|blood sugar|glucose|swelling|infection|douleur|fievre|fièvre|eruption|éruption|mal de tete|vomissement|nausee|nausée|diarrhee|diarrhée|tension|glycemie|glycémie|gonflement|جرعة|دواء|تشخيص|علاج|أعراض|اعراض|وصفة|اعراض جانبية|حمى|سخونة|صداع|قيء|غثيان|إسهال|اسهال|ضغط الدم|سكر الدم|تورم|التهاب)/i.test(normalized);
   if (clinical) return { intent: "out_of_scope", outcome: "human_handoff", answer: lang.out, handoff: true, safetyFlags: ["clinical_advice_blocked", "human_escalation"] };
 
   const schedule = /(remind|reminder|schedule|when|date|time|how often|frequency|rappel|rappeler|quand|horaire|frequence|combien de fois|date|وقت|موعد|تذكير|التذكير|كم مرة|كل كم)/i.test(normalized);
