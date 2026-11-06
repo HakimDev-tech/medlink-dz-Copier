@@ -19,6 +19,7 @@ const copy = {
     greeting: "Bonjour. Je peux vous aider à retrouver les consignes et les rappels de votre programme de suivi validé.",
     urgent: "Votre message peut nécessiter une évaluation rapide. Je ne peux pas évaluer une urgence. Contactez immédiatement les services d’urgence locaux ou votre professionnel de santé. Votre demande a été signalée au professionnel.",
     out: "Je ne peux pas établir de diagnostic, interpréter des symptômes, recommander un médicament, modifier une dose ou proposer un traitement. Votre professionnel de santé doit répondre à cette demande. Elle lui a été signalée.",
+    planName: (context: CarePlanContext) => "Le titre de votre programme est : " + context.title,
     period: (context: CarePlanContext) => "Programme : " + context.title + "\nDébut : " + new Date(context.starts_on + "T12:00:00Z").toLocaleDateString("fr-DZ",{timeZone:"Africa/Algiers"}) + (context.ends_on ? "\nFin : " + new Date(context.ends_on + "T12:00:00Z").toLocaleDateString("fr-DZ",{timeZone:"Africa/Algiers"}) : ""),
     schedule: (events: CarePlanContext["events"]) => events.length
       ? "Rappels enregistrés dans votre programme :\n" + events.map(e => "• " + e.label + " — " + new Date(e.event_at).toLocaleString("fr-DZ",{timeZone:"Africa/Algiers"}) + (e.instruction ? "\n  " + e.instruction : "")).join("\n")
@@ -30,6 +31,7 @@ const copy = {
     greeting: "Hello. I can help you find the instructions and reminders in your approved follow-up plan.",
     urgent: "Your message may require prompt assessment. I cannot assess emergencies. Contact local emergency services or your healthcare professional immediately. Your request has been flagged for the professional.",
     out: "I cannot diagnose, interpret symptoms, recommend medication, change a dose, or suggest treatment. Your healthcare professional must answer this request. It has been flagged for them.",
+    planName: (context: CarePlanContext) => "Your plan is titled: " + context.title,
     period: (context: CarePlanContext) => "Plan: " + context.title + "\nStart: " + new Date(context.starts_on + "T12:00:00Z").toLocaleDateString("en-US",{timeZone:"Africa/Algiers"}) + (context.ends_on ? "\nEnd: " + new Date(context.ends_on + "T12:00:00Z").toLocaleDateString("en-US",{timeZone:"Africa/Algiers"}) : ""),
     schedule: (events: CarePlanContext["events"]) => events.length
       ? "Reminders registered in your plan:\n" + events.map(e => "• " + e.label + " — " + new Date(e.event_at).toLocaleString("en-US",{timeZone:"Africa/Algiers"}) + (e.instruction ? "\n  " + e.instruction : "")).join("\n")
@@ -41,6 +43,7 @@ const copy = {
     greeting: "مرحباً. يمكنني مساعدتك في العثور على التعليمات والتذكيرات في برنامج المتابعة المعتمد.",
     urgent: "قد تتطلب رسالتك تقييماً عاجلاً. لا يمكنني تقييم الحالات الطارئة. اتصل فوراً بخدمات الطوارئ المحلية أو بالمهني الصحي. تمت إحالة طلبك إلى المهني.",
     out: "لا يمكنني التشخيص أو تفسير الأعراض أو اقتراح دواء أو تغيير جرعة أو تقديم علاج. يجب أن يجيب المهني الصحي عن هذا الطلب. تمت إحالته إليه.",
+    planName: (context: CarePlanContext) => "عنوان برنامجك هو: " + context.title,
     period: (context: CarePlanContext) => "البرنامج: " + context.title + "\nالبداية: " + new Date(context.starts_on + "T12:00:00Z").toLocaleDateString("ar-DZ",{timeZone:"Africa/Algiers"}) + (context.ends_on ? "\nالنهاية: " + new Date(context.ends_on + "T12:00:00Z").toLocaleDateString("ar-DZ",{timeZone:"Africa/Algiers"}) : ""),
     schedule: (events: CarePlanContext["events"]) => events.length
       ? "التذكيرات المسجلة في برنامجك:\n" + events.map(e => "• " + e.label + " — " + new Date(e.event_at).toLocaleString("ar-DZ",{timeZone:"Africa/Algiers"}) + (e.instruction ? "\n  " + e.instruction : "")).join("\n")
@@ -102,10 +105,14 @@ export function answerFromCarePlan(message: string, context: CarePlanContext, lo
   const schedule = /(remind|reminder|follow up|follow-up|schedule|how often|frequency|rappel|rappeler|suivi|frequence|combien de fois|تذكير|التذكير|المتابعة|متابعة|كم مرة|كل كم)/i.test(normalized);
   if (schedule) return { intent: "schedule_lookup", outcome: "answered_from_plan", answer: lang.schedule(context.events), handoff: false, safetyFlags: [] };
 
+  const planNameQuestion = /(plan name|what is my plan called|title of my plan|nom du programme|titre du programme|comment s appelle.*programme|اسم البرنامج|ما اسم البرنامج)/i.test(normalized);
+  if (planNameQuestion) return { intent: "plan_lookup", outcome: "answered_from_plan", answer: lang.planName(context), handoff: false, safetyFlags: [] };
+
   const periodQuestion = /(start date|beginning|when does.*start|when.*start|end date|when does.*end|date de debut|date du debut|quand commence|debut du programme|date de fin|quand se termine|بداية البرنامج|متى يبدأ|تاريخ البداية|نهاية البرنامج|متى ينتهي|تاريخ النهاية)/i.test(normalized);
   if (periodQuestion) return { intent: "plan_lookup", outcome: "answered_from_plan", answer: lang.period(context), handoff: false, safetyFlags: [] };
 
-  const passages = retrieveApprovedPassages(message, context.title + "\n" + context.instructions);
+  const approvedContext = [context.title, context.instructions, ...context.events.map(event => [event.label,event.instruction].filter(Boolean).join(". "))].join("\n");
+  const passages = retrieveApprovedPassages(message, approvedContext);
   if (passages.length) return { intent: "plan_lookup", outcome: "answered_from_plan", answer: lang.found(passages), handoff: false, safetyFlags: [] };
 
   return { intent: "unknown", outcome: "human_handoff", answer: lang.unknown, handoff: true, safetyFlags: ["answer_not_found_in_approved_plan", "human_escalation"] };
