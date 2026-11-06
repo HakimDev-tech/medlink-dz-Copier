@@ -16,6 +16,7 @@ export type AgentResult = {
 
 const copy = {
   fr: {
+    greeting: "Bonjour. Je peux vous aider à retrouver les consignes et les rappels de votre programme de suivi validé.",
     urgent: "Votre message peut nécessiter une évaluation rapide. Je ne peux pas évaluer une urgence. Contactez immédiatement les services d’urgence locaux ou votre professionnel de santé. Votre demande a été signalée au professionnel.",
     out: "Je ne peux pas établir de diagnostic, interpréter des symptômes, recommander un médicament, modifier une dose ou proposer un traitement. Votre professionnel de santé doit répondre à cette demande. Elle lui a été signalée.",
     schedule: (events: CarePlanContext["events"]) => events.length
@@ -25,6 +26,7 @@ const copy = {
     unknown: "Je ne trouve pas cette information dans les consignes publiées. Je préfère ne pas l’interpréter. Votre demande a été transmise à votre professionnel pour examen."
   },
   en: {
+    greeting: "Hello. I can help you find the instructions and reminders in your approved follow-up plan.",
     urgent: "Your message may require prompt assessment. I cannot assess emergencies. Contact local emergency services or your healthcare professional immediately. Your request has been flagged for the professional.",
     out: "I cannot diagnose, interpret symptoms, recommend medication, change a dose, or suggest treatment. Your healthcare professional must answer this request. It has been flagged for them.",
     schedule: (events: CarePlanContext["events"]) => events.length
@@ -34,6 +36,7 @@ const copy = {
     unknown: "I cannot find this information in the published instructions, so I will not infer an answer. Your request has been sent to your healthcare professional for review."
   },
   ar: {
+    greeting: "مرحباً. يمكنني مساعدتك في العثور على التعليمات والتذكيرات في برنامج المتابعة المعتمد.",
     urgent: "قد تتطلب رسالتك تقييماً عاجلاً. لا يمكنني تقييم الحالات الطارئة. اتصل فوراً بخدمات الطوارئ المحلية أو بالمهني الصحي. تمت إحالة طلبك إلى المهني.",
     out: "لا يمكنني التشخيص أو تفسير الأعراض أو اقتراح دواء أو تغيير جرعة أو تقديم علاج. يجب أن يجيب المهني الصحي عن هذا الطلب. تمت إحالته إليه.",
     schedule: (events: CarePlanContext["events"]) => events.length
@@ -84,6 +87,9 @@ function retrieveApprovedPassages(question: string, instructions: string): strin
 export function answerFromCarePlan(message: string, context: CarePlanContext, locale: AgentLocale): AgentResult {
   const lang = copy[locale];
   const normalized = normalize(message);
+  const greeting = /^(bonjour|bonsoir|salut|hello|hi|hey|good morning|good evening|merci|thanks|thank you|شكرا|السلام عليكم|مرحبا)$/i.test(normalized);
+  if (greeting) return { intent: "unknown", outcome: "refused", answer: lang.greeting, handoff: false, safetyFlags: [] };
+
   const urgent = /(urgence|urgent|emergency|chest pain|difficulty breathing|cant breathe|can t breathe|shortness of breath|severe bleeding|unconscious|suicid|طوارئ|نزيف|صعوبة التنفس|ضيق التنفس|ألم شديد|فقدان الوعي)/i.test(normalized);
   if (urgent) return { intent: "urgent_escalation", outcome: "human_handoff", answer: lang.urgent, handoff: true, safetyFlags: ["possible_urgent_symptom", "human_escalation"] };
 
