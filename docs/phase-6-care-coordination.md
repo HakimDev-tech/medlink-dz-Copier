@@ -61,7 +61,9 @@ Ordre de traitement :
 9. Journaliser l'intention, le résultat et les indicateurs de sécurité, sans conserver le texte brut de la question.
 10. Créer une escalade et notifier le professionnel en cas de transfert humain.
 
-Le mécanisme actuel est un pseudo-RAG lexical déterministe. Il ne fait pas appel à un LLM, n'effectue aucun diagnostic, ne recommande aucun traitement, ne modifie aucun programme et ne remplace pas un professionnel. Un futur fournisseur de modèle devra rester derrière cette frontière de sécurité et ne recevoir que les passages approuvés strictement nécessaires.
+Le mécanisme actuel est un pseudo-RAG lexical déterministe. Les réponses de dates utilisent les métadonnées enregistrées et les dates sont formatées dans le fuseau `Africa/Algiers`. Il ne fait pas appel à un LLM, n'effectue aucun diagnostic, ne recommande aucun traitement, ne modifie aucun programme et ne remplace pas un professionnel.
+
+Les scénarios unitaires de sécurité sont définis dans `tests/follow-up-agent.test.mjs` et lancés par `npm run test:agent`. Une vérification automatisée de ces scénarios et du build est configurée dans `.github/workflows/quality.yml`. Un futur fournisseur de modèle devra rester derrière cette frontière de sécurité et ne recevoir que les passages approuvés strictement nécessaires.
 
 ## 5. Notifications et distribution
 
