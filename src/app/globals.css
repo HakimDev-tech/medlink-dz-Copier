@@ -54,3 +54,9 @@ button:focus-visible,a:focus-visible{outline:3px solid #4b9a7d66;outline-offset:
  .action-group .btn{flex:1}
  .message-bubble{max-width:94%}
 }
+
+.directory-cta{display:flex;align-items:center;gap:18px;padding:22px;background:#fff;border:1px solid var(--line);border-radius:18px}
+.directory-cta>div:nth-child(2){flex:1;min-width:0}
+.directory-cta h3{font-size:16px;margin:0 0 5px}
+.directory-cta p{font-size:13px;color:var(--muted);line-height:1.7;margin:0}
+@media(max-width:560px){.directory-cta{align-items:stretch;flex-direction:column}.directory-cta .btn{width:100%}}
