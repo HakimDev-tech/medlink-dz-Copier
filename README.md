@@ -40,7 +40,7 @@ Le point d'entrée applicatif est `POST /api/agent/follow-up`. L'assistant :
 - répond avec les rappels enregistrés lorsqu'une question porte sur les dates ;
 - refuse les demandes de diagnostic, d'interprétation de symptômes, de médicament, de dose ou de traitement ;
 - signale les demandes hors périmètre et les signaux d'urgence au professionnel concerné ;
-- journalise l'intention, le résultat et les indicateurs de sécurité, sans conserver le texte brut de la question.
+- journalise l'intention, le résultat et les indicateurs de sécurité, sans conserver le texte brut de la question ;\n- applique une limite de 20 requêtes par patient sur une fenêtre glissante de 10 minutes.
 
 Il s'agit volontairement d'un **pseudo-RAG déterministe**, pas d'un LLM ni d'un moteur vectoriel. Aucun fournisseur IA externe ni clé API de modèle n'est nécessaire pour ce socle. Il ne prend aucune décision clinique, ne modifie pas un programme et ne remplace pas le professionnel.
 
