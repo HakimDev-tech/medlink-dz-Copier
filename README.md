@@ -41,9 +41,9 @@ Les contrôles de statut, l'association rendez-vous/patient/professionnel et les
 
 Le point d'entrée applicatif est `POST /api/agent/follow-up`. L'assistant :
 - n'accepte qu'un patient authentifié qui possède le programme publié demandé ;
-- récupère uniquement les consignes et les rappels futurs de ce programme ;
-- effectue une recherche lexicale conservatrice dans les consignes approuvées et ne restitue que les passages correspondants ;
-- répond avec les rappels enregistrés lorsqu'une question porte sur les dates ;
+- récupère uniquement le titre, les consignes, la période et les rappels futurs de ce programme ;
+- effectue une recherche lexicale conservatrice dans les consignes approuvées ainsi que les intitulés et instructions des rappels ;
+- répond avec les métadonnées de période et les rappels enregistrés lorsqu'une question porte sur les dates ;
 - refuse les demandes de diagnostic, d'interprétation de symptômes, de médicament, de dose ou de traitement ;
 - signale les demandes hors périmètre et les signaux d'urgence au professionnel concerné ;
 - journalise l'intention, le résultat et les indicateurs de sécurité, sans conserver le texte brut de la question ;
