@@ -19,9 +19,10 @@ export default function ConsultationForm({doctorId,appointmentId,patientId,initi
  return <section className="panel component-stack"><h2>{tr(locale,"consultation")}</h2><form onSubmit={save} className="form-stack">
   <div className="input"><label>{tr(locale,"consultationSummary")}</label><textarea name="summary" rows={4} maxLength={5000} defaultValue={record?.summary||""} disabled={locked} placeholder={tr(locale,"consultationSummary")}/></div>
   <div className="input"><label>{tr(locale,"patientInstructions")}</label><textarea name="instructions" rows={4} maxLength={5000} defaultValue={record?.patient_instructions||""} disabled={locked} placeholder={tr(locale,"patientInstructions")}/></div>
-  {!locked&&<><div className="input"><label>{tr(locale,"privateNotes")}</label><textarea rows={3} maxLength={10000} value={privateNotes} onChange={e=>setPrivateNotes(e.target.value)} placeholder={tr(locale,"privateNotes")}/></div><button className="btn primary" type="submit" disabled={busy}>{tr(locale,"saveConsultation")}</button></>}
+  {!locked&&<><div className="input"><label>{tr(locale,"privateNotes")}</label><textarea rows={3} maxLength={10000} value={privateNotes} onChange={e=>setPrivateNotes(e.target.value)} disabled={locked} placeholder={tr(locale,"privateNotes")}/></div><button className="btn primary" type="submit" disabled={busy}>{tr(locale,"saveConsultation")}</button></>}
  </form>
  {record?.status==="draft"&&<button className="btn soft" type="button" onClick={publish} disabled={busy}>{tr(locale,"publishConsultation")}</button>}
+ {locked&&<p className="notice">{tr(locale,"consultationLocked")}</p>}
  {message&&<p className="notice" role="status">{message}</p>}
  </section>;
 }
