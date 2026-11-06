@@ -46,6 +46,18 @@ test("hands medication and dosage questions to the professional",()=>{
   assert.equal(result.handoff,true);
 });
 
+test("hands medication discontinuation questions to the professional",()=>{
+  const result=answerFromCarePlan("Can I stop taking my antibiotics?",context,"en");
+  assert.equal(result.intent,"out_of_scope");
+  assert.equal(result.outcome,"human_handoff");
+});
+
+test("recognizes common French emergency wording",()=>{
+  const result=answerFromCarePlan("J'ai une douleur dans la poitrine et un essoufflement",context,"fr");
+  assert.equal(result.intent,"urgent_escalation");
+  assert.equal(result.handoff,true);
+});
+
 test("flags potential emergencies without attempting assessment",()=>{
   const result=answerFromCarePlan("I have chest pain and difficulty breathing",context,"en");
   assert.equal(result.intent,"urgent_escalation");
