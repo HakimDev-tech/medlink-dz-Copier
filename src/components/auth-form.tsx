@@ -10,39 +10,39 @@ const messages = {
   fr: {
     patientTitle:"Créer un compte patient", loginTitle:"Connexion", doctorTitle:"Candidature professionnelle",
     doctorIntro:"Renseignez vos informations professionnelles. Votre demande sera examinée manuellement.",
-    authIntro:"Authentification sécurisée via Supabase Auth.", email:"Adresse e-mail", password:"Mot de passe",
+    authIntro:"Accès sécurisé à votre espace MedLink DZ.", email:"Adresse e-mail", password:"Mot de passe",
     fullName:"Nom complet", displayName:"Nom public du professionnel", specialty:"Spécialité", wilaya:"Wilaya",
     reference:"Référence professionnelle", referenceHint:"Indiquez votre référence professionnelle. Les justificatifs seront déposés dans votre espace sécurisé.",
     submitRegister:"Créer mon compte", submitLogin:"Se connecter", submitDoctor:"Envoyer ma demande", busy:"Traitement…",
     needLogin:"Vous devez être connecté pour déposer une candidature.", created:"Compte créé. Vérifiez votre boîte e-mail pour confirmer votre adresse, puis connectez-vous.",
     submitted:"Demande enregistrée. Ajoutez vos justificatifs professionnels pour terminer votre dossier.",
-    config:"Configuration Supabase manquante.", connectFirst:"Connectez-vous d'abord avec votre compte.",
+    config:"Le service est momentanément indisponible. Réessayez plus tard.", connectFirst:"Connectez-vous d'abord avec votre compte.",
     error:"Une erreur est survenue.", already:"Déjà inscrit ?", noAccount:"Pas encore de compte ?",
     createPatient:"Créer un compte patient", createAccount:"Créer un compte", home:"Retour à l'accueil",
   },
   en: {
     patientTitle:"Create a patient account", loginTitle:"Sign in", doctorTitle:"Professional application",
     doctorIntro:"Enter your professional details. Your application will be reviewed manually.",
-    authIntro:"Secure authentication powered by Supabase Auth.", email:"Email address", password:"Password",
+    authIntro:"Secure access to your MedLink DZ account.", email:"Email address", password:"Password",
     fullName:"Full name", displayName:"Public professional name", specialty:"Specialty", wilaya:"Wilaya",
     reference:"Professional registration reference", referenceHint:"Enter your professional reference. Supporting documents can be uploaded securely in your account.",
     submitRegister:"Create account", submitLogin:"Sign in", submitDoctor:"Submit application", busy:"Processing…",
     needLogin:"You must sign in before submitting a professional application.", created:"Account created. Check your inbox to confirm your email address, then sign in.",
     submitted:"Application saved. Upload your professional credentials to complete your file.",
-    config:"Supabase configuration is missing.", connectFirst:"Please sign in to your account first.",
+    config:"The service is temporarily unavailable. Please try again later.", connectFirst:"Please sign in to your account first.",
     error:"An error occurred.", already:"Already registered?", noAccount:"Don't have an account yet?",
     createPatient:"Create a patient account", createAccount:"Create an account", home:"Back to home",
   },
   ar: {
     patientTitle:"إنشاء حساب مريض", loginTitle:"تسجيل الدخول", doctorTitle:"طلب تسجيل مهني",
     doctorIntro:"أدخل معلوماتك المهنية. ستتم مراجعة طلبك يدوياً.",
-    authIntro:"مصادقة آمنة عبر Supabase Auth.", email:"البريد الإلكتروني", password:"كلمة المرور",
+    authIntro:"دخول آمن إلى مساحة MedLink DZ.", email:"البريد الإلكتروني", password:"كلمة المرور",
     fullName:"الاسم الكامل", displayName:"الاسم المهني الظاهر", specialty:"التخصص", wilaya:"الولاية",
     reference:"مرجع التسجيل المهني", referenceHint:"أدخل مرجعك المهني. يمكنك رفع الوثائق الداعمة بأمان من حسابك.",
     submitRegister:"إنشاء الحساب", submitLogin:"تسجيل الدخول", submitDoctor:"إرسال الطلب", busy:"جارٍ المعالجة…",
     needLogin:"يجب تسجيل الدخول قبل إرسال طلب مهني.", created:"تم إنشاء الحساب. تحقق من بريدك الإلكتروني لتأكيد العنوان ثم سجّل الدخول.",
     submitted:"تم حفظ الطلب. أضف الوثائق المهنية لإكمال ملفك.",
-    config:"إعدادات Supabase غير مكتملة.", connectFirst:"يرجى تسجيل الدخول أولاً.",
+    config:"الخدمة غير متاحة مؤقتاً. حاول مجدداً لاحقاً.", connectFirst:"يرجى تسجيل الدخول أولاً.",
     error:"حدث خطأ.", already:"لديك حساب بالفعل؟", noAccount:"ليس لديك حساب بعد؟",
     createPatient:"إنشاء حساب مريض", createAccount:"إنشاء حساب", home:"العودة إلى الصفحة الرئيسية",
   },
@@ -63,7 +63,7 @@ export default function AuthForm({ mode, locale }: { mode: Mode; locale: string 
       const supabase = createClient();
       supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
     } catch (e) {
-      setError(e instanceof Error ? e.message : t.config);
+      setError(t.config);
     }
   }, [mode, t.config]);
 
@@ -113,7 +113,7 @@ export default function AuthForm({ mode, locale }: { mode: Mode; locale: string 
         router.refresh();
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : t.error);
+      setError(t.error);
     } finally { setBusy(false); }
   }
 
