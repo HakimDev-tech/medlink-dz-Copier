@@ -1,1 +1,11 @@
-import type {Metadata} from "next";import "./globals.css";export const metadata:Metadata={title:"MedLink DZ — Le parcours de soin, mieux accompagné",description:"Plateforme trilingue de coordination entre patients, médecins et cliniques en Algérie."};export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="fr"><body>{children}</body></html>}
+import type {Metadata} from "next";
+import "./globals.css";
+export const metadata:Metadata={
+ title:"MedLink DZ — Coordination du parcours de soins",
+ description:"Plateforme de coordination entre patients et professionnels de santé en Algérie."
+};
+export default async function RootLayout({children,params}:{children:React.ReactNode;params?:Promise<{locale?:string}>}){
+ const routeParams=params?await params:{};
+ const locale=["fr","en","ar"].includes(routeParams.locale||"")?routeParams.locale!:"fr";
+ return <html lang={locale} dir={locale==="ar"?"rtl":"ltr"}><body>{children}</body></html>;
+}
