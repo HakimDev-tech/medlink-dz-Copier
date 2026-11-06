@@ -1,24 +1,24 @@
 "use client";
-import {useEffect,useState} from "react";
+import {useEffect,useState} from "react";import {useRouter} from "next/navigation";
 import {createClient} from "@/lib/supabase/client";
 import {localeTag,tr} from "@/lib/i18n";
 type Notice={id:string;title:string;body:string;created_at:string;category?:string;read_at:string|null};
 export default function NotificationFeed({userId,initial,empty,locale,title}:{userId:string;initial:Notice[];empty:string;locale:string;title:string}){
- const [items,setItems]=useState(initial),[busyId,setBusyId]=useState<string|null>(null),[error,setError]=useState("");
+ const [items,setItems]=useState(initial),[busyId,setBusyId]=useState<string|null>(null),[error,setError]=useState("");const router=useRouter();
  useEffect(()=>{
   const supabase=createClient();
   const channel=supabase.channel("medlink-notifications-"+userId)
    .on("postgres_changes",{event:"*",schema:"public",table:"notifications",filter:"user_id=eq."+userId},payload=>{
     if(payload.eventType==="INSERT"){
      const row=payload.new as Notice;
-     setItems(old=>old.some(x=>x.id===row.id)?old:[row,...old].slice(0,30));
+     setItems(old=>old.some(x=>x.id===row.id)?old:[row,...old].slice(0,30));router.refresh();
     }else if(payload.eventType==="UPDATE"){
      const row=payload.new as Notice;
      setItems(old=>old.map(x=>x.id===row.id?{...x,...row}:x));
     }
    }).subscribe();
   return()=>{void supabase.removeChannel(channel);};
- },[userId]);
+ },[userId,router]);
  async function markRead(id:string){
   setBusyId(id);setError("");
   try{
