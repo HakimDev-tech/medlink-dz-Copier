@@ -1,4 +1,3 @@
--- Require a published consultation record before creating or editing a follow-up plan.
 create or replace function private.enforce_followup_plan_integrity()
 returns trigger
 language plpgsql

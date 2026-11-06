@@ -3,7 +3,7 @@
 MVP produit de coordination du parcours de soins en Algérie, disponible en français, arabe et anglais. Le lancement public doit rester progressif, avec des professionnels réellement vérifiés et après validation des prérequis réglementaires et opérationnels.
 
 ## Stack
-- Next.js 15.5.28, React 19, TypeScript, Tailwind CSS 4
+- Next.js 15.5.29, React 19, TypeScript, Tailwind CSS 4
 - Supabase Auth, PostgreSQL, Row Level Security, Realtime et pg_cron
 - Vercel
 
@@ -32,7 +32,7 @@ Ne jamais exposer une clé `service_role` ou `sb_secret_*` dans le navigateur ou
 3. Il rédige un résumé destiné au patient, les consignes qui lui sont remises et, séparément, ses notes privées.
 4. Le brouillon peut être corrigé. La publication demande une confirmation explicite.
 5. Une fois publié, le compte rendu est accessible au patient et devient immuable. Les notes privées restent réservées au professionnel.
-6. Le professionnel crée un programme de suivi lié au rendez-vous terminé, ajoute ou retire les rappels, peut corriger le brouillon, puis le publie.
+6. Après publication du compte rendu, le professionnel crée un programme de suivi lié au rendez-vous terminé, ajoute ou retire les rappels, peut corriger le brouillon, puis le publie.
 7. Le patient voit le programme, ses prochains rappels, les notifications et peut poser des questions à l'assistant.
 
 Les contrôles de statut, l'association rendez-vous/patient/professionnel et les règles d'accès sont également appliqués côté base de données. L'interface seule n'est jamais considérée comme une frontière de sécurité.

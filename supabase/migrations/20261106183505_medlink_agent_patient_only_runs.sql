@@ -1,4 +1,3 @@
--- Only the patient who owns a published plan may create assistant run records.
 drop policy if exists "participants record own care agent runs" on public.care_agent_runs;
 create policy "patient records own care agent runs"
 on public.care_agent_runs

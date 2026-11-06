@@ -37,7 +37,7 @@ Les champs destinés au patient ne doivent contenir que le résumé et les consi
 
 Composant : `src/components/follow-up-plan-form.tsx`.
 
-- Un programme doit référencer le rendez-vous terminé correspondant, le patient correspondant et le professionnel affecté.
+- Un programme doit référencer le rendez-vous terminé correspondant, le patient correspondant, le professionnel affecté et le compte rendu de consultation publié.
 - Le brouillon est enregistrable, modifiable et récupérable après rechargement de l'espace professionnel.
 - Les rappels du brouillon peuvent être ajoutés et supprimés avant publication.
 - La publication exige au moins un rappel futur.
