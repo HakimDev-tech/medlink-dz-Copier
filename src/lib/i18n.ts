@@ -2,7 +2,7 @@ export type Locale = "fr" | "en" | "ar";
 
 const messages = {
   fr: {
-    authRequired:"Connexion requise", loginToContinue:"Connectez-vous pour accéder à cet espace.", signIn:"Se connecter",
+    patientShortLabel:"Patient",authRequired:"Connexion requise", loginToContinue:"Connectez-vous pour accéder à cet espace.", signIn:"Se connecter",
     requestAppointment:"Demander un rendez-vous", close:"Fermer", desiredDate:"Date et heure souhaitées", chooseFuture:"Choisissez une date future.",
     requestSent:"Votre demande a été transmise. Le professionnel doit encore confirmer le rendez-vous.", sendRequest:"Envoyer la demande", sending:"Envoi…", requestFailed:"Impossible d'envoyer la demande. Réessayez.",
     createFollowUp:"Créer un suivi après consultation", appointmentPatient:"Rendez-vous / patient", chooseAppointment:"Choisir un rendez-vous", selectAppointment:"Sélectionnez un rendez-vous existant.",
@@ -21,7 +21,7 @@ const messages = {
     careEscalations:"Demandes signalées par l’assistant",noEscalations:"Aucune demande à examiner.",markReview:"Prendre en charge",resolveEscalation:"Marquer comme traité",escalationUpdateFailed:"Impossible de mettre à jour cette demande.",status_open:"À examiner",escalationUrgent:"Signal d’urgence",escalationOutOfScope:"Demande hors périmètre",escalationUnknown:"Demande non couverte",notificationRead:"Lu",notificationUnread:"Non lu",markNotificationRead:"Marquer comme lu",notificationUpdateFailed:"Impossible de marquer cette notification comme lue.", 
   },
   en: {
-    authRequired:"Sign-in required", loginToContinue:"Sign in to access this area.", signIn:"Sign in",
+    patientShortLabel:"Patient",authRequired:"Sign-in required", loginToContinue:"Sign in to access this area.", signIn:"Sign in",
     requestAppointment:"Request an appointment", close:"Close", desiredDate:"Preferred date and time", chooseFuture:"Choose a future date and time.",
     requestSent:"Your request has been sent. The professional must still confirm the appointment.", sendRequest:"Send request", sending:"Sending…", requestFailed:"Could not send the request. Please try again.",
     createFollowUp:"Create a post-consultation follow-up", appointmentPatient:"Appointment / patient", chooseAppointment:"Choose an appointment", selectAppointment:"Select an existing appointment.",
@@ -40,7 +40,7 @@ const messages = {
     careEscalations:"Assistant hand-offs",noEscalations:"No requests need review.",markReview:"Start review",resolveEscalation:"Mark as resolved",escalationUpdateFailed:"Could not update this request.",status_open:"Needs review",escalationUrgent:"Potential emergency",escalationOutOfScope:"Out-of-scope request",escalationUnknown:"Request not covered",notificationRead:"Read",notificationUnread:"Unread",markNotificationRead:"Mark as read",notificationUpdateFailed:"Could not mark this notification as read.",
   },
   ar: {
-    authRequired:"يلزم تسجيل الدخول", loginToContinue:"سجّل الدخول للوصول إلى هذه المساحة.", signIn:"تسجيل الدخول",
+    patientShortLabel:"المريض",authRequired:"يلزم تسجيل الدخول", loginToContinue:"سجّل الدخول للوصول إلى هذه المساحة.", signIn:"تسجيل الدخول",
     requestAppointment:"طلب موعد", close:"إغلاق", desiredDate:"التاريخ والوقت المفضّلان", chooseFuture:"يرجى اختيار تاريخ ووقت في المستقبل.",
     requestSent:"تم إرسال طلبك. يجب على المهني تأكيد الموعد.", sendRequest:"إرسال الطلب", sending:"جارٍ الإرسال…", requestFailed:"تعذّر إرسال الطلب. حاول مجدداً.",
     createFollowUp:"إنشاء متابعة بعد الاستشارة", appointmentPatient:"الموعد / المريض", chooseAppointment:"اختر موعداً", selectAppointment:"يرجى اختيار موعد موجود.",
