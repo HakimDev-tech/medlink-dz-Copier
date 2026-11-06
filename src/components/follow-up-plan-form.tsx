@@ -7,8 +7,8 @@ type EventOption={id:string;event_at:string;label:string;instruction:string|null
 export default function FollowUpPlanForm({doctorId,appointments,locale}:{doctorId:string;appointments:AppointmentOption[];locale:string}){
  const [busy,setBusy]=useState(false),[message,setMessage]=useState(""),[draftId,setDraftId]=useState<string|null>(null),[events,setEvents]=useState<EventOption[]>([]);
  async function submit(event:FormEvent<HTMLFormElement>){
-  event.preventDefault();const form=new FormData(event.currentTarget),appointment=appointments.find(a=>a.id===String(form.get("appointment")||""));
-  if(!appointment){setMessage(tr(locale,"selectAppointment"));return;}
+  event.preventDefault();const form=new FormData(event.currentTarget),appointment=draftId?null:appointments.find(a=>a.id===String(form.get("appointment")||""));
+  if(!draftId&&!appointment){setMessage(tr(locale,"selectAppointment"));return;}
   const title=String(form.get("title")||"").trim(),instructions=String(form.get("instructions")||"").trim();
   const start=String(form.get("starts_on")||""),end=String(form.get("ends_on")||"");
   if(!title||!instructions){setMessage(tr(locale,"saveFailed"));return;}
@@ -21,7 +21,7 @@ export default function FollowUpPlanForm({doctorId,appointments,locale}:{doctorI
     if(error)throw error;
     setMessage(tr(locale,"draftUpdated"));
    }else{
-    const {data,error}=await supabase.from("follow_up_plans").insert({doctor_id:doctorId,patient_id:appointment.patient_id,appointment_id:appointment.id,title,instructions,starts_on:start,ends_on:end||null,status:"draft"}).select("id").single();
+    const {data,error}=await supabase.from("follow_up_plans").insert({doctor_id:doctorId,patient_id:appointment!.patient_id,appointment_id:appointment!.id,title,instructions,starts_on:start,ends_on:end||null,status:"draft"}).select("id").single();
     if(error)throw error;
     setDraftId(data.id);setEvents([]);setMessage(tr(locale,"draftSaved"));
    }
