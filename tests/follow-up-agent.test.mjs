@@ -27,6 +27,18 @@ test("returns plan period from stored metadata",()=>{
   assert.match(result.answer,/End:/);
 });
 
+test("answers questions from approved reminder instructions",()=>{
+  const result=answerFromCarePlan("Que dit le rappel : présentez-vous à l'heure convenue ?",context,"fr");
+  assert.equal(result.outcome,"answered_from_plan");
+  assert.match(result.answer,/Présentez-vous à l'heure convenue/);
+});
+
+test("returns the stored plan title when asked",()=>{
+  const result=answerFromCarePlan("What is my plan called?",context,"en");
+  assert.equal(result.intent,"plan_lookup");
+  assert.match(result.answer,/Suivi après consultation/);
+});
+
 test("hands medication and dosage questions to the professional",()=>{
   const result=answerFromCarePlan("Can I change my medication dose?",context,"en");
   assert.equal(result.outcome,"human_handoff");
