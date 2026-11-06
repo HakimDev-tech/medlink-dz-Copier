@@ -1,4 +1,3 @@
--- Cover foreign-key lookups used by the phase 6 dashboards and dispatcher.
 create index if not exists care_agent_escalations_patient_idx on public.care_agent_escalations(patient_id);
 create index if not exists care_agent_escalations_plan_idx on public.care_agent_escalations(plan_id);
 create index if not exists care_agent_runs_actor_idx on public.care_agent_runs(actor_id);

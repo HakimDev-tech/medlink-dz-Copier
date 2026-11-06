@@ -1,4 +1,3 @@
--- Notify the assigned professional when a patient cancels an appointment or home visit.
 create or replace function private.notify_appointment_lifecycle()
 returns trigger language plpgsql security definer set search_path = '' as $$
 declare doctor_user_id uuid; patient_lang text; doctor_lang text; title_text text; body_text text;

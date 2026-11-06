@@ -1,4 +1,3 @@
--- Localize home-visit lifecycle notifications for patients and professionals.
 create or replace function private.notify_medlink_home_visit()
 returns trigger
 language plpgsql

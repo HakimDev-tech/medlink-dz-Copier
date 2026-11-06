@@ -1,4 +1,3 @@
--- Restrict escalation updates to the workflow fields and enforce valid clinician transitions.
 revoke update on public.care_agent_escalations from authenticated;
 grant update(status,resolved_at) on public.care_agent_escalations to authenticated;
 

@@ -1,4 +1,3 @@
--- Avoid silently changing a reminder after its notification has already been sent or claimed.
 create or replace function private.prevent_followup_event_reassignment()
 returns trigger
 language plpgsql

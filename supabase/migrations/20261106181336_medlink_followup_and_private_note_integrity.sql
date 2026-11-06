@@ -1,4 +1,3 @@
--- Prevent client-side reassignment or silent edits to published clinical instructions.
 create or replace function private.enforce_followup_plan_integrity()
 returns trigger
 language plpgsql

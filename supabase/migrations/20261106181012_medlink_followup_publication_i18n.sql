@@ -1,4 +1,3 @@
--- Localize the patient notification sent when a professional publishes a care plan.
 create or replace function private.notify_medlink_followup_published()
 returns trigger
 language plpgsql

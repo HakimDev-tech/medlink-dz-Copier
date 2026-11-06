@@ -1,4 +1,3 @@
--- Keep private consultation note modification timestamps accurate.
 create or replace function private.enforce_consultation_private_note_owner()
 returns trigger
 language plpgsql
