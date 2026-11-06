@@ -12,9 +12,9 @@ export default function CarePlanAgent({planId,locale}:{planId:string;locale:stri
    const data=await response.json() as {answer?:string;handoff?:boolean};
    if(response.status===429){setError(tr(locale,"agentRateLimited"));return;}
    if(!response.ok)throw new Error("agent");
-   const answer=data.answer;
-   if(typeof answer!=="string")throw new Error("agent");
-   setMessages(old=>[...old,{role:"assistant",content:answer,handoff:!!data.handoff}]);
+   if(typeof data.answer!=="string")throw new Error("agent");
+   const answerText:string=data.answer;
+   setMessages(old=>[...old,{role:"assistant",content:answerText,handoff:!!data.handoff}]);
   }catch{setError(tr(locale,"agentError"));}
   finally{setBusy(false);}
  }
