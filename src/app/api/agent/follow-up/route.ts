@@ -17,6 +17,15 @@ export async function POST(request: Request) {
     const {data:{user}, error:authError} = await supabase.auth.getUser();
     if (authError || !user) return NextResponse.json({error:"unauthorized"}, {status:401});
 
+    const windowStart = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const {count:recentRuns,error:rateError} = await supabase
+      .from("care_agent_runs")
+      .select("id",{count:"exact",head:true})
+      .eq("actor_id",user.id)
+      .gte("created_at",windowStart);
+    if (rateError) return NextResponse.json({error:"agent_audit_unavailable"},{status:503});
+    if ((recentRuns ?? 0) >= 20) return NextResponse.json({error:"rate_limited"},{status:429});
+
     // This assistant is patient-facing. A doctor must use the professional workspace, not impersonate a patient.
     const {data:plan, error:planError} = await supabase
       .from("follow_up_plans")
