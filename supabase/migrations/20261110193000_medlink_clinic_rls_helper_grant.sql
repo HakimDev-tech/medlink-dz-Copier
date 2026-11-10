@@ -1,0 +1,1 @@
+grant execute on function private.is_medlink_clinic_manager(uuid) to authenticated;
