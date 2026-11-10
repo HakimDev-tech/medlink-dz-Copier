@@ -9,7 +9,7 @@ Deno.serve(async(req:Request)=>{
  if(req.method==="OPTIONS")return new Response("ok",{headers:cors});
  if(req.method==="GET")return json({availability:channelAvailability()});
  if(req.method!=="POST")return json({error:"method_not_allowed"},405);
- const supplied=req.headers.get("authorization")?.replace(/^Bearer\s+/i,"")||"";
+ const supplied=req.headers.get("x-medlink-dispatch-secret")?.trim()||"";
  const url=Deno.env.get("SUPABASE_URL"),serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
  if(!url||!serviceKey)return json({error:"worker_not_configured"},503);
  const db=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
