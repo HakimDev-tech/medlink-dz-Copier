@@ -85,7 +85,7 @@ create table if not exists public.clinic_invitations(
 );
 create unique index if not exists clinic_invitation_pending_email_idx on public.clinic_invitations(clinic_id,lower(email)) where status='pending';
 alter table public.clinic_invitations enable row level security;
-create policy "clinic managers read invitations" on public.clinic_invitations for select to authenticated using(exists(select 1 from public.clinic_members m where m.clinic_id=clinic_id and m.user_id=(select auth.uid()) and m.member_role in('owner','clinic_admin')));
+create policy "clinic managers read invitations" on public.clinic_invitations for select to authenticated using(exists(select 1 from public.clinic_members m where m.clinic_id=clinic_id and m.user_id=(select auth.uid()) and m.member_role in('owner','manager')));
 revoke all on public.clinic_invitations from anon,authenticated;grant select on public.clinic_invitations to authenticated;
 create or replace function public.create_medlink_clinic(p_name text,p_wilaya text,p_commune text,p_address text)
 returns uuid language plpgsql security definer set search_path='' as $$
@@ -97,12 +97,12 @@ begin if u is null then raise exception 'authentication_required';end if;
  return cid;
 end;$$;
 revoke all on function public.create_medlink_clinic(text,text,text,text) from public,anon;grant execute on function public.create_medlink_clinic(text,text,text,text) to authenticated;
-create or replace function public.invite_medlink_clinic_member(p_clinic_id uuid,p_email text,p_role text default 'staff')
+create or replace function public.invite_medlink_clinic_member(p_clinic_id uuid,p_email text,p_role text default 'receptionist')
 returns uuid language plpgsql security definer set search_path='' as $$
 declare u uuid:=auth.uid();inv uuid;tok text:=encode(gen_random_bytes(32),'hex');target uuid;
 begin if u is null then raise exception 'authentication_required';end if;
- if p_role not in('clinic_admin','staff') or position('@' in p_email)=0 then raise exception 'invalid_invitation';end if;
- if not exists(select 1 from public.clinics c where c.id=p_clinic_id and (c.owner_id=u or exists(select 1 from public.clinic_members m where m.clinic_id=c.id and m.user_id=u and m.member_role in('owner','clinic_admin')))) then raise exception 'clinic_admin_required';end if;
+ if p_role not in('manager','receptionist','doctor') or position('@' in p_email)=0 then raise exception 'invalid_invitation';end if;
+ if not exists(select 1 from public.clinics c where c.id=p_clinic_id and (c.owner_id=u or exists(select 1 from public.clinic_members m where m.clinic_id=c.id and m.user_id=u and m.member_role in('owner','manager')))) then raise exception 'clinic_admin_required';end if;
  select id into target from auth.users where lower(email)=lower(trim(p_email));
  if target is not null and exists(select 1 from public.clinic_members m where m.clinic_id=p_clinic_id and m.user_id=target and coalesce(m.member_status,'active')='active') then raise exception 'already_a_member';end if;
  insert into public.clinic_invitations(clinic_id,email,member_role,invited_by,token_hash) values(p_clinic_id,lower(trim(p_email)),p_role,u,encode(digest(tok,'sha256'),'hex')) returning id into inv;
