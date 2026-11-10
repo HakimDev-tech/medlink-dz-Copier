@@ -64,8 +64,9 @@ export async function POST(request: Request) {
       intent:result.intent,
       outcome:result.outcome,
       safety_flags:result.safetyFlags
-    });
-    if (runError) return NextResponse.json({error:"agent_audit_unavailable"}, {status:503});
+    }).select("id").single();
+    if (runError||!run) return NextResponse.json({error:"agent_audit_unavailable"}, {status:503});
+    if(result.handoff){const {error:handoffError}=await supabase.rpc("attach_care_agent_handoff",{p_run_id:run.id,p_message:body.message.trim(),p_locale:locale});if(handoffError)return NextResponse.json({error:"handoff_unavailable"},{status:503});
 
     return NextResponse.json({
       answer:result.answer,
