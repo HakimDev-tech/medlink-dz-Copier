@@ -24,7 +24,7 @@ function objectAt(source, marker) {
 }
 
 function propertyObject(source, property) {
-  const match = new RegExp(`(?:^|[,\\s])${property}\\s*:`).exec(source);
+  const match = new RegExp(`(?:^|[,{\\s])${property}\\s*:`).exec(source);
   assert.ok(match, `Missing locale property: ${property}`);
   return objectAt(source.slice(match.index), property);
 }
