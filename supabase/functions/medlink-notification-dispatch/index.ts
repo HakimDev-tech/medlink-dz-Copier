@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "npm:@supabase/supabase-js@2";
-import {channelAvailability,deliver,type DeliveryChannel,type DeliveryPayload,DeliveryError} from "../_shared/notification-providers.ts";
+import {channelAvailability,deliver,type DeliveryChannel,type DeliveryPayload,DeliveryError} from "./notification-providers.ts";
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization,content-type"};
 const json=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers:{...cors,"Content-Type":"application/json"}});
 const retrySeconds=[60,300,900,3600,21600];
