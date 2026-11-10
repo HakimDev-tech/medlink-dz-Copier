@@ -65,7 +65,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
         <p className={styles.summary}>{plan.summary}</p>
         <div className={styles.price}><strong>{plan.price}</strong><span>DA {t.period}</span></div>
         <ul>{plan.features.map(feature => <li key={feature}><Check size={16}/><span>{feature}</span></li>)}</ul>
-        <Link className={styles.cta} href={`/${lang}/professional/register`}>{t.choose}<ArrowUpRight size={15}/></Link>
+        <Link className={styles.cta} href={`/${lang}/professional/billing`}>{t.choose}<ArrowUpRight size={15}/></Link>
       </article>)}
     </section>
     <p className={styles.tax}>{t.tax}</p>
