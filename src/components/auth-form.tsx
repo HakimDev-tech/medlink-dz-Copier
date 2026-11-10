@@ -79,7 +79,7 @@ export default function AuthForm({ mode, locale }: { mode: Mode; locale: string 
           password: String(form.get("password") ?? ""),
           options: {
             data: { full_name: String(form.get("full_name") ?? ""), preferred_language: locale },
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/${locale}/patient`,
+            emailRedirectTo: new URL(`/auth/callback?next=/${locale}/patient`, process.env.NEXT_PUBLIC_SITE_URL || window.location.origin).toString(),
           },
         });
         if (authError) throw authError;
