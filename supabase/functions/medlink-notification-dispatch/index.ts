@@ -16,7 +16,7 @@ Deno.serve(async(req:Request)=>{
  const{data:valid,error:secretError}=await db.rpc("validate_medlink_notification_dispatch_secret",{p_secret:supplied});
  if(secretError||valid!==true)return json({error:"unauthorized"},401);
  const{data:jobs,error:claimError}=await db.rpc("claim_notification_delivery_jobs",{p_batch_size:25});
- if(claimError)return json({error:"queue_unavailable"},503);
+ if(claimError){console.error("notification_delivery_claim_failed",{code:claimError.code,message:claimError.message});return json({error:"queue_unavailable",code:claimError.code||"unknown"},503)}
  let sent=0,failed=0,retried=0;
  for(const job of (jobs||[]) as Job[]){
   try{
