@@ -20,7 +20,7 @@ Deno.serve(async(req:Request)=>{
  let sent=0,failed=0,retried=0;
  for(const job of (jobs||[]) as Job[]){
   try{
-   const[{data:notice,error:noticeError},{data:profile,error:profileError},{data:authResult,error:authError}]=await Promise.all([db.from("notifications").select("category").eq("id",job.notification_id).maybeSingle(),db.from("profiles").select("phone,preferred_language").eq("id",job.user_id).maybeSingle(),db.auth.admin.getUserById(job.user_id)]);
+   const[{data:notice,error:noticeError},{data:profile,error:profileError},{data:prefs,error:prefsError},{data:authResult,error:authError}]=await Promise.all([db.from("notifications").select("category").eq("id",job.notification_id).maybeSingle(),db.from("profiles").select("phone,preferred_language").eq("id",job.user_id).maybeSingle(),db.from("notification_preferences").select("email_enabled,sms_enabled,whatsapp_enabled,email_consent_at,sms_consent_at,whatsapp_consent_at").eq("user_id",job.user_id).maybeSingle(),db.auth.admin.getUserById(job.user_id)]);
    if(noticeError||profileError||authError||!notice||!profile||!authResult.user)throw new DeliveryError("recipient_lookup_failed",true);
    const user=authResult.user,locale=profile.preferred_language==="ar"||profile.preferred_language==="en"?profile.preferred_language:"fr";let destination="";
    if(job.channel==="email"){if(!user.email_confirmed_at||!user.email)throw new DeliveryError("recipient_not_verified",false);destination=user.email}
