@@ -26,7 +26,7 @@ export async function sendNotification(channel:DeliveryChannel,p:DeliveryPayload
   return{providerMessageId:typeof result.sid==="string"?result.sid:null};
  }
  const version=process.env.WHATSAPP_GRAPH_VERSION!;
- const language=p.locale==="ar"?"ar":"fr";
+ const language=p.locale==="ar"?"ar":p.locale==="en"?"en_US":"fr";
  const result=await request("https://graph.facebook.com/"+version+"/"+encodeURIComponent(process.env.WHATSAPP_PHONE_NUMBER_ID!)+"/messages",{method:"POST",headers:{"Authorization":"Bearer "+process.env.WHATSAPP_ACCESS_TOKEN,"Content-Type":"application/json"},body:JSON.stringify({messaging_product:"whatsapp",to:p.to,type:"template",template:{name:process.env.WHATSAPP_TEMPLATE_NAME,language:{code:language}}})});
  const messages=result.messages as Array<{id?:string}>|undefined;
  return{providerMessageId:messages?.[0]?.id||null};
