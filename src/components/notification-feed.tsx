@@ -2,6 +2,7 @@
 import {useEffect,useState} from "react";import {useRouter} from "next/navigation";
 import {createClient} from "@/lib/supabase/client";
 import {localeTag,tr} from "@/lib/i18n";
+import NotificationPreferences from "@/components/notification-preferences";
 type Notice={id:string;title:string;body:string;created_at:string;category?:string;read_at:string|null};
 export default function NotificationFeed({userId,initial,empty,locale,title}:{userId:string;initial:Notice[];empty:string;locale:string;title:string}){
  const [items,setItems]=useState(initial),[busyId,setBusyId]=useState<string|null>(null),[error,setError]=useState("");const router=useRouter();
@@ -28,7 +29,7 @@ export default function NotificationFeed({userId,initial,empty,locale,title}:{us
    setItems(old=>old.map(item=>item.id===id?{...item,read_at:new Date().toISOString()}:item));
   }catch{setError(tr(locale,"notificationUpdateFailed"));}finally{setBusyId(null);}
  }
- return <section className="panel component-stack"><h2>{title}</h2>
+ return <section className="panel component-stack"><h2>{title}</h2><NotificationPreferences locale={locale}/>
   {error&&<p className="form-error" role="alert">{error}</p>}
   {items.length===0?<p className="muted">{empty}</p>:items.map(n=><article className={"notification-item"+(n.read_at?" is-read":" is-unread")} key={n.id}>
    <div className="notification-content"><strong>{n.title}</strong><p>{n.body}</p><small>{new Date(n.created_at).toLocaleString(localeTag(locale))}</small></div>

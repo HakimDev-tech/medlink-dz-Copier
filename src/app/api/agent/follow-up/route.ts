@@ -1,6 +1,7 @@
 import {NextResponse} from "next/server";
 import {createClient} from "@/lib/supabase/server";
-import {answerFromCarePlan,type AgentLocale} from "@/lib/agent/follow-up-agent";
+import {retrievePatientAnswer} from "@/lib/agent/retrieval";
+import type {AgentLocale} from "@/lib/agent/follow-up-agent";
 
 export const runtime = "nodejs";
 
@@ -36,6 +37,9 @@ export async function POST(request: Request) {
       .maybeSingle();
     if (planError || !plan) return NextResponse.json({error:"plan_not_found"}, {status:404});
 
+    const {data:entitlement,error:entitlementError}=await supabase.from("doctor_subscriptions").select("id,subscription_plans!inner(code)").eq("doctor_id",plan.doctor_id).eq("status","active").gt("current_period_end",new Date().toISOString()).in("subscription_plans.code",["ai","premium"]).limit(1).maybeSingle();
+    if(entitlementError)return NextResponse.json({error:"entitlement_check_unavailable"},{status:503});
+    if(!entitlement)return NextResponse.json({error:"assistant_not_included_in_plan"},{status:403});
     const {data:events, error:eventError} = await supabase
       .from("follow_up_events")
       .select("event_at,label,instruction")
@@ -45,7 +49,7 @@ export async function POST(request: Request) {
       .limit(50);
     if (eventError) return NextResponse.json({error:"plan_context_unavailable"}, {status:503});
 
-    const result = answerFromCarePlan(body.message.trim(), {
+    const result = await retrievePatientAnswer(body.message.trim(), {
       title:plan.title,
       instructions:plan.instructions,
       starts_on:plan.starts_on,
@@ -54,14 +58,15 @@ export async function POST(request: Request) {
     }, locale);
 
     // Store only intent/outcome/safety flags; never persist the patient's raw message or medical text.
-    const {error:runError} = await supabase.from("care_agent_runs").insert({
+    const {data:run,error:runError} = await supabase.from("care_agent_runs").insert({
       plan_id:plan.id,
       actor_id:user.id,
       intent:result.intent,
       outcome:result.outcome,
       safety_flags:result.safetyFlags
-    });
-    if (runError) return NextResponse.json({error:"agent_audit_unavailable"}, {status:503});
+    }).select("id").single();
+    if (runError||!run) return NextResponse.json({error:"agent_audit_unavailable"}, {status:503});
+    if(result.handoff){const {error:handoffError}=await supabase.from("care_agent_escalations").update({patient_message:body.message.trim(),message_locale:locale}).eq("run_id",run.id).eq("patient_id",user.id).eq("status","open");if(handoffError)return NextResponse.json({error:"handoff_unavailable"},{status:503});}
 
     return NextResponse.json({
       answer:result.answer,

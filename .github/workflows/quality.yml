@@ -2,7 +2,7 @@ name: MedLink quality checks
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/medlink-doctor-subscriptions]
   pull_request:
     branches: [main]
 
@@ -14,9 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  agent-safety-and-build:
+  quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,8 +27,12 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Verify FR/EN/AR translation catalogue parity
+        run: node --test tests/locale-parity.test.mjs
       - name: Run deterministic care-agent safety tests
         run: npm run test:agent
+      - name: Run ESLint
+        run: npm run lint
       - name: Build production application
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://build-placeholder.supabase.co

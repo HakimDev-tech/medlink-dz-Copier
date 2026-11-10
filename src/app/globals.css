@@ -82,3 +82,15 @@ button:focus-visible,a:focus-visible{outline:3px solid #4b9a7d66;outline-offset:
 [dir=rtl] .notification-state{justify-content:flex-start}
 [dir=rtl] .agent-message p{text-align:right}
 @media(max-width:560px){.notification-item{flex-direction:column}.notification-state{justify-content:flex-start}.notification-read{width:100%}}
+
+.notification-preferences{display:grid;gap:12px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#fbfdfb}
+.notification-preferences h3{margin:0;font-size:15px}
+.notification-preferences p{margin:4px 0;color:var(--muted);font-size:12px;line-height:1.6}
+.notification-preference{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer}
+.notification-preference span{display:grid;gap:3px}
+.notification-preference strong{font-size:13px}
+.notification-preference small,.notification-preferences>small{font-size:11px;color:var(--muted)}
+.notification-preference input{width:18px;height:18px;accent-color:#38896b}
+.notification-preferences .btn{justify-self:start}
+[dir=rtl] .notification-preference{flex-direction:row-reverse}
+[dir=rtl] .notification-preferences .btn{justify-self:end}

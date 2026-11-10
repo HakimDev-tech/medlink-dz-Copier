@@ -1,22 +1,12 @@
 "use client";
-import {useState,type FormEvent} from "react";
-import {useRouter} from "next/navigation";
-import {createClient} from "@/lib/supabase/client";
-import {tr} from "@/lib/i18n";
+import {useEffect,useState,type FormEvent} from "react";import {useRouter} from "next/navigation";import {createClient} from "@/lib/supabase/client";import {tr,localeTag} from "@/lib/i18n";
+type Slot={slot_start:string;duration_minutes:number};
+const labels={fr:{date:"Date souhaitée",slot:"Créneau disponible",loading:"Recherche des créneaux…",none:"Aucun créneau disponible pour cette date.",choose:"Choisir un créneau",future:"Sélectionnez un créneau disponible.",failed:"Impossible d'envoyer la demande. Actualisez les disponibilités.",sent:"Demande de rendez-vous envoyée.",sending:"Envoi…"},en:{date:"Preferred date",slot:"Available time",loading:"Loading available slots…",none:"No available slots for this date.",choose:"Choose a time",future:"Select an available time.",failed:"Could not send the request. Refresh availability.",sent:"Appointment request sent.",sending:"Sending…"},ar:{date:"التاريخ المطلوب",slot:"موعد متاح",loading:"جار البحث عن المواعيد…",none:"لا توجد مواعيد متاحة لهذا اليوم.",choose:"اختر موعداً",future:"يرجى اختيار موعد متاح.",failed:"تعذر إرسال الطلب. حدّث المواعيد.",sent:"تم إرسال طلب الموعد.",sending:"جار الإرسال…"}};
+function localDate(){return new Date().toLocaleDateString("en-CA",{timeZone:"Africa/Algiers"});}
 export default function DoctorBooking({doctorId,locale}:{doctorId:string;locale:string}){
- const [open,setOpen]=useState(false),[busy,setBusy]=useState(false),[message,setMessage]=useState(""),router=useRouter();
- async function submit(event:FormEvent<HTMLFormElement>){
-  event.preventDefault();setBusy(true);setMessage("");
-  try{const supabase=createClient();const {data,error}=await supabase.auth.getUser();if(error)throw error;if(!data.user){router.push("/"+locale+"/login");return;}
-   const form=new FormData(event.currentTarget),raw=String(form.get("starts_at")||""),startsAt=new Date(raw);
-   if(!raw||Number.isNaN(startsAt.getTime())||startsAt.getTime()<=Date.now())throw new Error(tr(locale,"chooseFuture"));
-   const {error:writeError}=await supabase.from("appointments").insert({patient_id:data.user.id,doctor_id:doctorId,starts_at:startsAt.toISOString(),status:"requested"});
-   if(writeError)throw writeError;setMessage(tr(locale,"requestSent"));setOpen(false);
-  }catch(e){setMessage(e instanceof Error&&e.message===tr(locale,"chooseFuture")?e.message:tr(locale,"requestFailed"));}
-  finally{setBusy(false);}
- }
- const min=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
- return <div className="component-stack"><button className="btn primary" type="button" aria-expanded={open} onClick={()=>setOpen(v=>!v)}>{open?tr(locale,"close"):tr(locale,"requestAppointment")}</button>
- {open&&<form onSubmit={submit} className="form-stack"><div className="input"><label>{tr(locale,"desiredDate")}</label><input name="starts_at" type="datetime-local" min={min} required/></div><button className="btn primary" disabled={busy} type="submit">{busy?tr(locale,"sending"):tr(locale,"sendRequest")}</button></form>}
- {message&&<div className="notice" role="status">{message}</div>}</div>;
+ const [open,setOpen]=useState(false),[date,setDate]=useState(localDate()),[slots,setSlots]=useState<Slot[]>([]),[loadingSlots,setLoadingSlots]=useState(false),[busy,setBusy]=useState(false),[message,setMessage]=useState(""),[selected,setSelected]=useState(""),router=useRouter(),l=(["fr","en","ar"].includes(locale)?locale:"fr") as "fr"|"en"|"ar",t=labels[l];
+ const maxDate=new Date(Date.now()+90*86400000).toLocaleDateString("en-CA",{timeZone:"Africa/Algiers"});
+ useEffect(()=>{let live=true;setLoadingSlots(true);setSelected("");const db=createClient();db.rpc("get_medlink_available_slots",{p_doctor_id:doctorId,p_date:date}).then(({data,error})=>{if(!live)return;setSlots(error?[]:(data??[]) as Slot[]);setLoadingSlots(false);});return()=>{live=false}},[doctorId,date]);
+ async function submit(event:FormEvent<HTMLFormElement>){event.preventDefault();setBusy(true);setMessage("");try{const supabase=createClient();const {data,error}=await supabase.auth.getUser();if(error)throw error;if(!data.user){router.push("/"+locale+"/login");return;}const slot=slots.find(x=>x.slot_start===selected);if(!slot)throw new Error("slot");const {error:writeError}=await supabase.from("appointments").insert({patient_id:data.user.id,doctor_id:doctorId,starts_at:slot.slot_start,duration_minutes:slot.duration_minutes,status:"requested"});if(writeError)throw writeError;setMessage(t.sent);setOpen(false);router.refresh();}catch{setMessage(t.failed);}finally{setBusy(false);}}
+ return <div className="component-stack"><button className="btn primary" type="button" aria-expanded={open} onClick={()=>setOpen(v=>!v)}>{open?tr(locale,"close"):tr(locale,"requestAppointment")}</button>{open&&<form onSubmit={submit} className="form-stack"><div className="input"><label>{t.date}</label><input name="date" type="date" min={localDate()} max={maxDate} value={date} onChange={e=>setDate(e.target.value)} required/></div><div className="input"><label>{t.slot}</label>{loadingSlots?<small className="muted">{t.loading}</small>:slots.length===0?<small className="muted">{t.none}</small>:<select value={selected} onChange={e=>setSelected(e.target.value)} required><option value="">{t.choose}</option>{slots.map(s=><option key={s.slot_start} value={s.slot_start}>{new Date(s.slot_start).toLocaleTimeString(localeTag(l),{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Algiers"})} · {s.duration_minutes} min</option>)}</select>}</div><button className="btn primary" disabled={busy||loadingSlots||!selected}>{busy?t.sending:tr(locale,"sendRequest")}</button></form>}{message&&<div className="notice" role="status">{message}</div>}</div>;
 }
