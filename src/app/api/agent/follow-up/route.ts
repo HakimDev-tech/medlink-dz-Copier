@@ -1,6 +1,7 @@
 import {NextResponse} from "next/server";
 import {createClient} from "@/lib/supabase/server";
-import {answerFromCarePlan,type AgentLocale} from "@/lib/agent/follow-up-agent";
+import {retrievePatientAnswer} from "@/lib/agent/retrieval";
+import type {AgentLocale} from "@/lib/agent/follow-up-agent";
 
 export const runtime = "nodejs";
 
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
       .limit(50);
     if (eventError) return NextResponse.json({error:"plan_context_unavailable"}, {status:503});
 
-    const result = answerFromCarePlan(body.message.trim(), {
+    const result = await retrievePatientAnswer(body.message.trim(), {
       title:plan.title,
       instructions:plan.instructions,
       starts_on:plan.starts_on,
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
     }, locale);
 
     // Store only intent/outcome/safety flags; never persist the patient's raw message or medical text.
-    const {error:runError} = await supabase.from("care_agent_runs").insert({
+    const {data:run,error:runError} = await supabase.from("care_agent_runs").insert({
       plan_id:plan.id,
       actor_id:user.id,
       intent:result.intent,
