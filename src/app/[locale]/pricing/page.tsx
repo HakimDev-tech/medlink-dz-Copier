@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, Bot, Check, ClipboardList, ShieldCheck, Sparkles, Stethoscope } from "lucide-react";
 import styles from "./pricing.module.css";
 import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+export const dynamic = "force-dynamic";
 
 type Locale = "fr" | "ar" | "en";
 
@@ -47,6 +49,8 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
   const lang = locale as Locale;
   const t = content[lang];
   const rtl = lang === "ar";
+  const supabase = await createClient();
+  const { data: catalogue } = await supabase.from("subscription_plans").select("code,amount,is_active").eq("is_active", true).order("sort_order");
   return <main className={styles.page} lang={lang} dir={rtl ? "rtl" : "ltr"}>
     <header className={styles.header}>
       <Link href={"/" + lang} className={styles.brand}><span className={styles.brandMark}><Stethoscope size={17}/></span>medlink<span>.</span></Link>
@@ -58,15 +62,20 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       <p>{t.intro}</p>
     </section>
     <section className={styles.grid} aria-label="Professional plans">
-      {t.plans.map((plan) => <article key={plan.code} className={`${styles.card} ${"popular" in plan && plan.popular ? styles.popular : ""}`}>
-        {"popular" in plan && plan.popular && <div className={styles.popularTag}><Sparkles size={13}/>{lang === "fr" ? "Le plus choisi" : lang === "ar" ? "الخيار المميز" : "Most selected"}</div>}
-        <div className={styles.planIcon}>{plan.icon === "manual" ? <ClipboardList size={20}/> : plan.icon === "ai" ? <Bot size={20}/> : <Sparkles size={20}/>}</div>
-        <h2>{plan.name}</h2>
-        <p className={styles.summary}>{plan.summary}</p>
-        <div className={styles.price}><strong>{plan.price}</strong><span>DA {t.period}</span></div>
-        <ul>{plan.features.map(feature => <li key={feature}><Check size={16}/><span>{feature}</span></li>)}</ul>
-        <Link className={styles.cta} href={`/${lang}/professional/billing`}>{t.choose}<ArrowUpRight size={15}/></Link>
-      </article>)}
+      {(catalogue ?? []).map((plan) => {
+        const localized = t.plans.find(item => item.code === plan.code);
+        if (!localized) return null;
+        const amount = new Intl.NumberFormat(lang === "fr" ? "fr-DZ" : lang === "ar" ? "ar-DZ" : "en").format(plan.amount);
+        return <article key={plan.code} className={`${styles.card} ${localized.code === "ai" ? styles.popular : ""}`}>
+          {localized.code === "ai" && <div className={styles.popularTag}><Sparkles size={13}/>{lang === "fr" ? "Le plus choisi" : lang === "ar" ? "الخيار المميز" : "Most selected"}</div>}
+          <div className={styles.planIcon}>{localized.icon === "manual" ? <ClipboardList size={20}/> : localized.icon === "ai" ? <Bot size={20}/> : <Sparkles size={20}/>}</div>
+          <h2>{localized.name}</h2>
+          <p className={styles.summary}>{localized.summary}</p>
+          <div className={styles.price}><strong>{amount}</strong><span>DA {t.period}</span></div>
+          <ul>{localized.features.map(feature => <li key={feature}><Check size={16}/><span>{feature}</span></li>)}</ul>
+          <Link className={styles.cta} href={`/${lang}/professional/billing`}>{t.choose}<ArrowUpRight size={15}/></Link>
+        </article>;
+      })}
     </section>
     <p className={styles.tax}>{t.tax}</p>
     <section className={styles.guard}><ShieldCheck size={22}/><div><h2>{t.guardTitle}</h2><p>{t.guard}</p></div></section>
