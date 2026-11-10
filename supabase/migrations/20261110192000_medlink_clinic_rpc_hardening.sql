@@ -10,7 +10,8 @@ begin
  insert into public.clinic_members(clinic_id,user_id,member_role) values(cid,u,'owner');
  return cid;
 end;$$;
-create or replace function public.invite_medlink_clinic_member(p_clinic_id uuid,p_email text,p_role text default 'receptionist')
+drop function if exists public.invite_medlink_clinic_member(uuid,text,text);
+create function public.invite_medlink_clinic_member(p_clinic_id uuid,p_email text,p_role text default 'receptionist')
 returns jsonb language plpgsql security definer set search_path='' as $$
 declare u uuid:=auth.uid();inv uuid;tok text:=encode(extensions.gen_random_bytes(32),'hex');target uuid;target_role text;
 begin
